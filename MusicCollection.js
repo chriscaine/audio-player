@@ -2,19 +2,18 @@
 var Track = require('./Tracks.js')['Track'];
 var List = require('./Tracks.js')['List'];
 var Collection = require('./Collection.js');
-var directory = "\\\\Robert\\Public\\My Music\\Music\\Air";
+var directory = "\\\\Robert\\Public\\My Music\\Music";
 
 var collection = new Collection();
 
 collection.Load();
-console.log('NEXT', Object.keys(collection.Tracks).length);
-Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata) {
-    collection.Artists.Add(metadata.artist);
-    collection.Artists.Add(metadata.albumartist);
-    collection.Albums.Add(metadata.album);
+console.log('Library currently holds: ', Object.keys(collection.Tracks).length);
+Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata, file) {
+    collection.Artists.Add(metadata.artist, file);
+    collection.Artists.Add(metadata.albumartist, file);
+    collection.Albums.Add(metadata.album, file);
 }, function () {
     console.log('SAVE DATA');
-    if(Object.keys(collection).length === 3){
+    console.log('Saving: ', Object.keys(collection.Tracks).length, ' items');
         collection.Save();
-    }
 }));

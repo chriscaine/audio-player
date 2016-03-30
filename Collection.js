@@ -27,9 +27,8 @@
         _this.Tracks = collection.Tracks;
         console.log('LOADED');
     };
-    this.Save = function (collection) {
+    this.Save = function () {
         try {
-            console.log(_this);
             fs.writeFileSync('data/collection.json', JSON.stringify(_this));
             console.log('SAVED');
         } catch (e) {

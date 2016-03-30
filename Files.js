@@ -56,7 +56,7 @@ module.exports = {
                         if (tracks[file] === undefined) {
                             var trk = new Track(file);
                             trk.Init(function(metadata){
-                                callback(metadata);
+                                callback(metadata, file);
                                 next++;
                                 nextFile();
                             });
