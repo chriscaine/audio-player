@@ -1,11 +1,15 @@
-﻿var Files = require('./Files.js');
+﻿var fs = require('fs');
+var Files = require('./Files.js');
 var Track = require('./Tracks.js')['Track'];
 var List = require('./Tracks.js')['List'];
 var Collection = require('./Collection.js');
-var directory = "\\\\Robert\\Public\\My Music\\Music";
+
+
+//fs.writeFile('config.json', JSON.stringify({ "dir": "\\\\Robert\\Public\\My Music\\Music\\Alabama 3" }));
+
+var directory = JSON.parse(fs.readFileSync('config.json')).dir;
 
 var collection = new Collection();
-
 collection.Load();
 console.log('Library currently holds: ', Object.keys(collection.Tracks).length);
 Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata, file) {
@@ -15,5 +19,6 @@ Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metada
 }, function () {
     console.log('SAVE DATA');
     console.log('Saving: ', Object.keys(collection.Tracks).length, ' items');
-        collection.Save();
+    collection.Save();
 }));
+

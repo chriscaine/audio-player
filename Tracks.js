@@ -22,12 +22,13 @@ module.exports = {
                 if (key !== 'picture') _this[key] = metadata[key];
             }
             //_this._file.dispose();
-           // io.emit('data', _this.title);
+            console.log(_this.title);
             _this._callback(metadata);
         }
         this.Init = function (callback) {
             _this._callback = callback;
             _this._file = fs.createReadStream(_this.Key);
+            
             meta(_this._file, _this.Fill);
         }
         return this;

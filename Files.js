@@ -36,6 +36,8 @@ module.exports = {
                     } else {
                         if (isMusicTrack(file)) {
                             files.push(file);
+                        } else {
+                            console.log(file);
                         }
                     }
                 }
@@ -46,9 +48,10 @@ module.exports = {
     },
     GetTrackData: function (tracks, callback, completed) {
         var Track = require('./Tracks.js')['Track'];
-
+        
        return function (files) {
-            var next = 0;
+           var next = 0;
+           console.log(files.length, ' Files Found');
             var nextFile = function () {
                 setTimeout(function (obj) {
                     if (files[next]) {

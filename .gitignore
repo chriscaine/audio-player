@@ -48,3 +48,8 @@ Temporary Items
 
 # Node modules 
 node_modules/
+*.json
+data/collection.json
+.vs/audio-player/v14/.suo
+data/collection.json
+data/collection.json
