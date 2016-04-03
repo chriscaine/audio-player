@@ -1,0 +1,17 @@
+﻿
+<div>
+    <h1>Home</h1>
+    <input type="text" ng-model="search" />
+    <div>
+        <ul>
+            <li ng-repeat="a in collection.Artists.List | artist : search">
+                <h3>{{a.Name}}</h3>
+                <ul>
+                    <li ng-repeat="trk in a.List" ng-init="track = collection.Tracks[trk]">
+                        {{ track.title }}
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

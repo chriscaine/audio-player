@@ -53,3 +53,7 @@ data/collection.json
 .vs/audio-player/v14/.suo
 data/collection.json
 data/collection.json
+data/files.json
+data/files_backup.json
+.vs/config/applicationhost.config
+*.json

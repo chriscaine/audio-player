@@ -17,19 +17,25 @@ module.exports = {
         this.Key = key;
         var _this = this;
         this.Fill = function (err, metadata) {
-            if (err) { _this._failed = true; return; }
-            for (var key in metadata) {
-                if (key !== 'picture') _this[key] = metadata[key];
-            }
+            if (err) { _this._failed = true; console.log(err); return; }
+         //   for (var key in _this) {
+           //     if (metadata[key]) { _this[key] = metadata[key]; }
+          //  }
             //_this._file.dispose();
-            console.log(_this.title);
+           // console.log(_this.title);
             _this._callback(metadata);
         }
         this.Init = function (callback) {
             _this._callback = callback;
             _this._file = fs.createReadStream(_this.Key);
+            try {
+                meta(_this._file, _this.Fill);
+            } catch (e) {
+                console.log('ERROR ON:');
+                console.log(_this._file);
+                console.log(err);
+            }
             
-            meta(_this._file, _this.Fill);
         }
         return this;
     },
