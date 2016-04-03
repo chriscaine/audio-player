@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.10.2",
+    "groove": "2.5.0",
+    "lame": "^1.2.3",
     "musicmetadata": "^2.0.2",
     "promise": "^7.1.1",
     "q": "^1.4.1",
@@ -17,6 +19,6 @@
     "rx-node": "^1.0.2",
     "rxjs": "^5.0.0-beta.4",
     "socket.io": "^1.3.7",
-    "groove" : "2.5.0"
+    "speaker": "^0.2.6"
   }
 }

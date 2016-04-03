@@ -12,8 +12,7 @@ module.exports = {
                 return;
             }
         } catch (e) {
-            console.log(e);
-            return;
+           
         }
         var Progress = function (callback) {
             var values = {};
@@ -44,7 +43,7 @@ module.exports = {
             fs.readdir(dir, function (err, items) {
                 if (err) return;
                 for (var i = 0; i < items.length; i += 1) {
-                    var file = dir + '\\' + items[i];
+                    var file = dir + '/' + items[i];
                     if (fs.statSync(file).isDirectory()) {
                         getChildDirectory(file);
                     } else {
