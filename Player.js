@@ -2,7 +2,7 @@
 var fs = require('fs');
 var ffmpeg = require('fluent-ffmpeg');
 
-//var Speaker = require('speaker');
+var Speaker = require('speaker');
 var util  = require('util');
 var stream = require('stream');
 var wav = require('wav');
@@ -10,6 +10,7 @@ var wav = require('wav');
 // pcm_s16le
 
 const Player = function() {
+	var _this = this;
 	var passThru$ = new stream.PassThrough();
 	var reader;
 	var speaker;
@@ -30,7 +31,8 @@ const Player = function() {
 	}
 
 	var format = function(format) {
-		reader.pipe(new Speaker(format));
+		speaker = new Speaker(format);
+		reader.pipe(speaker);
 		if(_this.events['format']) { _this.events['format'](format);}
 	}
 
@@ -46,6 +48,9 @@ const Player = function() {
 	var decoded = function() {if(_this.events['decoded']) { _this.events['decoded']();}}
 	
 	this.Play = function(file) {
+		reader = null;
+		passThru$ = null;
+		speaker = null;
 		console.log('Playing: ', file);
 		var _this = this;
 		passThru$ = new stream.PassThrough();
@@ -56,9 +61,7 @@ const Player = function() {
 			.on('end', decoded).pipe(passThru$);
 		reader = new wav.Reader();
 		passThru$.pipe(reader);
-		reader.on('format', function(format) {
-			
-		}).on('end', destroy);
+		reader.on('format', format).on('end', destroy);
 	} 
 	return this;
 }

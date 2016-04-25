@@ -24,4 +24,3 @@ player.on('end', function () {
 });
 
 player.Play(tracks[0]);
-

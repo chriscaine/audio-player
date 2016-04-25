@@ -32,12 +32,12 @@
     <script src="js/providers/routeProvider.js"></script>
     <script src="js/directives/directiveMultiView.js"></script>
     <script src="js/services/serviceTemplate.js"></script>
-    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script src="http://192.168.1.11:80/socket.io/socket.io.js"></script>
     <script>
         var app = angular.module('app', ['core', 'rx']);
+	var socket = io.connect('http://192.168.1.11:80/');
+        app.config(function (routeProvider) {
 
-        app.config(function (routeProvider, apiProvider) {
-            apiProvider.setBaseRoute('/api/');
             routeProvider.when('/home', 'main', { templateUrl: '/partials/home.html', controller: 'HomeController' });
             console.log('config');
         });
@@ -45,51 +45,29 @@
             console.log('run');
         });
 
-        app.factory('CollectionService', function ($q, api) {
-            var _collectionApi = api({ endPoint: 'collection', before: null, after: null });
-            var _collection;
-            _collection = _collectionApi.query({}).then(function (e) {
-                if (e.status === 200) {
-                    _collection = e.data;
-                    return e.data;
-                }
-            });
+    
 
-            return {
-                Get: function () {
-                    return $q.all(_collection);
-                },
-                Update: function () {
-                    // ask server to update
-                    // receive io response when updated
-                }
-            }
+        app.controller('HomeController', function ($scope) {
+		$scope.searchClick = function() {
+		   socket.emit('searchquery', {
+			attribute : 'song', 
+			value: 'Hello',
+			orderBy : ['track__no', false]
+		   });
+			
+		}
+	       
+        	var first = true;
+		
 
+	        socket.on('searchresult', function (data) {
+        	    console.log(data);
+        	});
         });
 
-        app.factory('PlaylistService', function ($q, api) {
+        
 
-            return {
-                Get: function (id) { },
-                Query: function () { },
-                Save: function (id) { }
-            }
-        });
-
-        app.controller('HomeController', function ($scope, CollectionService) {
-            $scope.collection = {};
-            CollectionService.Get().then(function (e) {
-                $scope.collection = e;
-            })
-        });
-
-        /*
-        var socket = io.connect('http://localhost:8080/');
-        var first = true;
-        socket.on('data', function (data) {
-            console.log(data);
-        });
-        */
+        
 
 
         /* SORTABLES

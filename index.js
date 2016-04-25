@@ -8,7 +8,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use(express.static('public'));
-http.listen(8080);
+http.listen(80);
 
 
 
@@ -21,6 +21,7 @@ try {
 } catch (e) {
     console.log(e);
 }
+var dc = new DataCollection(tracks);
 
 var tracks = [];
 
@@ -29,27 +30,24 @@ for (var key in data.Tracks) {
 }
 
 
-var dc = new DataCollection(tracks);
+var find = {};
+find['title__contains'] ='Hello';
 
-console.log();
+console.log(dc.query().filter(find).values());
 
 
 
+io.on('connection', function(socket) {
+	console.log('connection');
 
-io.on('search', function (obj) {
-    /*
-        obj = {
-	        attribute:
-            value:
-            orderBy : ['attr', reverse]
-    
-    { 'artist__contains': 'Dolly' }
-         }
-    */
+ socket.on('searchquery', function (obj) {
+    console.log(obj);
 
-    // GetQuery(obj)
 
-    io.emit('search', dc.query().filter(function (obj) {
-        return obj.attribue + '__contains';
-    }).order(obj.orderBy[0], obj.orderBy[1]).values());
+
+    socket.emit('searchresult', dc.query().filter(find).values());
+
+	//.order(obj.orderBy[0], obj.orderBy[1])
+ });
+
 });

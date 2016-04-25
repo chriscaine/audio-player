@@ -26,19 +26,15 @@ passThru$.on('data', function(chunk) {
 var reader = new wav.Reader();
 reader.on('format', function(format) {
 	reader.pipe(new Speaker(format));
+}).on('end', function() {
+	play(songs[1]);
 });
 
-setTimeout(function() {
-	passThru$.pause();
-	setTimeout(function() {
-		passThru$.resume();
+var songs = ['/media/MUSIC/Music/Alabama 3/Exile On Coldharbor Lane/01 Connected.m4a', 
+		'/media/MUSIC/Music/Alabama 3/Exile On Coldharbor Lane/02 Speed Of The Sound Of Loneliness.m4a'];
 
-	}, 2000);
-
-}, 5000);
-
-
-var command = ffmpeg('test.m4a')
+function play(file) {
+	ffmpeg(file)
 	.audioCodec('pcm_s16le')
 	.audioChannels(2)
 	.audioFrequency(44100)
@@ -55,5 +51,8 @@ var command = ffmpeg('test.m4a')
 	.on('end', function() {
 		//console.log('end')
 	}).pipe(passThru$);
-
+}
 passThru$.pipe(reader);
+
+play(songs[0]);
+
