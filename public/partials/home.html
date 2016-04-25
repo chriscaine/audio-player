@@ -5,13 +5,8 @@
     <input type="button" value="Search" ng-click="searchClick()" />
     <div>
         <ul>
-            <li ng-repeat="a in collection.Artists.List | artist : search">
-                <h3>{{a.Name}}</h3>
-                <ul>
-                    <li ng-repeat="trk in a.List" ng-init="track = collection.Tracks[trk]">
-                        {{ track.title }}
-                    </li>
-                </ul>
+            <li ng-repeat="a in results">
+                <span>{{a.title}}</span>
             </li>
         </ul>
     </div>

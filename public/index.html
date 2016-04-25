@@ -54,10 +54,13 @@
 		}
 	       
         	var first = true;
-		
+		$scope.$watch('search', function(n, o, e) {
+			if(n) socket.emit('searchquery', ['title', n]);
+		});
 
 	        socket.on('searchresult', function (data) {
         	    console.log(data);
+		    $scope.results = data.result;
         	});
         });
 
