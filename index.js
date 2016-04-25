@@ -8,7 +8,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use(express.static('public'));
-http.listen(80);
+http.listen(8080);
 
 
 
@@ -21,33 +21,32 @@ try {
 } catch (e) {
     console.log(e);
 }
-var dc = new DataCollection(tracks);
+
 
 var tracks = [];
 
 for (var key in data.Tracks) {
     tracks.push(data.Tracks[key]);
 }
+var dc = new DataCollection(tracks);
 
+function buildFilter(search) {
+    var find = {};
+    find[search[0] + '__icontains'] = search[1];
+    return find;
+}
 
-var find = {};
-find['title__contains'] ='Hello';
+var search = ['title', 'hello'];
 
-console.log(dc.query().filter(find).values());
-
+console.log(dc.query().filter(buildFilter(search)).values());
 
 
 io.on('connection', function(socket) {
 	console.log('connection');
 
- socket.on('searchquery', function (obj) {
-    console.log(obj);
-
-
-
-    socket.emit('searchresult', dc.query().filter(find).values());
-
-	//.order(obj.orderBy[0], obj.orderBy[1])
+ socket.on('searchquery', function (search) {
+    console.log(search);
+    socket.emit('searchresult', dc.query().filter(buildFilter(search)).values());
  });
 
 });

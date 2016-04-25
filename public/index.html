@@ -49,11 +49,7 @@
 
         app.controller('HomeController', function ($scope) {
 		$scope.searchClick = function() {
-		   socket.emit('searchquery', {
-			attribute : 'song', 
-			value: 'Hello',
-			orderBy : ['track__no', false]
-		   });
+		   socket.emit('searchquery', ['title', $scope.search]);
 			
 		}
 	       
