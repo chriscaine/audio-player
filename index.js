@@ -8,7 +8,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use(express.static('public'));
-http.listen(80);
+http.listen(8080);
 
 
 
@@ -37,7 +37,7 @@ function buildFilter(search) {
 }
 
 var search = ['title', 'hello'];
-
+console.log(buildFilter(search));
 console.log(dc.query().filter(buildFilter(search)).values());
 
 
@@ -45,8 +45,10 @@ io.on('connection', function(socket) {
 	console.log('connection');
 
  socket.on('searchquery', function (search) {
-    console.log(search);
-    socket.emit('searchresult', { result: dc.query().filter(buildFilter(search)).values()});
+     console.log(search);
+     if (search[1].length > 3) {
+         socket.emit('searchresult', { result: dc.query().filter(buildFilter(search)).values() });
+     }
  });
 
 });

@@ -4,19 +4,67 @@
     <title>Socket.IO Position</title>
     <meta name="viewport" value="width=device-width;initial-scale=1" />
     <style type="text/css">
-        body, :root { font-size: 10px; background:#e9e9e9;}
-        h1, h2{
-            font-family:sans-serif;
-            font-size:18px;
-            margin: 0 0 12px 0;
-            color:#555;
+        body, :root {
+            font-size: 10px;
+            background: #e9e9e9;
         }
-       
 
+        h1, h2 {
+            font-family: sans-serif;
+            font-size: 18px;
+            margin: 0 0 12px 0;
+            color: #555;
+        }
+
+        .container {
+            margin: 20px;
+            font-size: 0;
+        }
+
+        .search-box {
+            display: inline-block;
+            width: 30%;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            vertical-align: top;
+            font-size: 1.4rem;
+        }
+
+        .playlist-box {
+            display: inline-block;
+            width: 30%;
+            vertical-align: top;
+            background: #666;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            font-size: 1.4rem;
+        }
+
+        ul {
+            min-height: 40px;
+            width: auto;
+            margin:10px 10px 30px 10px;
+            padding:0;
+            list-style:none;
+        }
+        li {
+            background:#f5f5f5;
+            font-size:1.6rem;
+            line-height:1.4em;
+            padding:0.5em;
+            border-radius:3px;
+            border: solid 1px #e5e5e5;
+            cursor:pointer;
+            margin-bottom:5px;
+        }
     </style>
 </head>
 <body>
-   <h1>Audio-Player</h1>
+    <h1>Audio-Player</h1>
+
+
+
     <div multi-view="main"></div>
 
     <script src="js/lib/jquery-1.7.1.min.js"></script>
@@ -32,10 +80,10 @@
     <script src="js/providers/routeProvider.js"></script>
     <script src="js/directives/directiveMultiView.js"></script>
     <script src="js/services/serviceTemplate.js"></script>
-    <script src="http://192.168.1.11:80/socket.io/socket.io.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
     <script>
         var app = angular.module('app', ['core', 'rx']);
-	var socket = io.connect('http://192.168.1.11:80/');
+        var socket = io.connect('http://localhost:8080/');
         app.config(function (routeProvider) {
 
             routeProvider.when('/home', 'main', { templateUrl: '/partials/home.html', controller: 'HomeController' });
@@ -45,28 +93,52 @@
             console.log('run');
         });
 
-    
+
 
         app.controller('HomeController', function ($scope) {
-		$scope.searchClick = function() {
-		   socket.emit('searchquery', ['title', $scope.search]);
-			
-		}
-	       
-        	var first = true;
-		$scope.$watch('search', function(n, o, e) {
-			if(n) socket.emit('searchquery', ['title', n]);
-		});
+            var sortables = [];
+            $('ul.tracks').each(function (index, item) {
+                var sortable = new Sortable(item, {
+                    group: {
+                        name: 'sortable',
+                        pull: 'clone',
+                        put: false
+                    }
+                });
+                sortables.push(sortable);
+            });
 
-	        socket.on('searchresult', function (data) {
-        	    console.log(data);
-		    $scope.results = data.result;
-        	});
+            $('ul.playlist').each(function (index, item) {
+                var sortable = new Sortable(item, {
+                    group: 'sortable',
+                    //handle: '.drag-handle',
+                    onAdd: function (evt) {
+                        $(evt.item).remove();
+                        $(evt.target).append(evt.item);    
+                    }
+                });
+                console.log(sortable);
+                sortables.push(sortable);
+            });
+            $scope.searchClick = function () {
+                socket.emit('searchquery', ['title', $scope.search]);
+
+            }
+
+            var first = true;
+            $scope.$watch('search', function (n, o, e) {
+                if (n) socket.emit('searchquery', ['title', n]);
+            });
+
+            socket.on('searchresult', function (data) {
+                console.log(data);
+                $scope.results = data.result;
+            });
         });
 
-        
 
-        
+
+
 
 
         /* SORTABLES
@@ -76,7 +148,7 @@
                         handle: '.drag-handle',
                         onAdd: function (evt) {
                             if (!evt.item.classList.contains('set-item')) {
-                                $(evt.item).remove(); 
+                                $(evt.item).remove();
                                 var item = addListItem(evt.item.getAttribute('data-directive'));
                                 $timeout(function () {
                                     $compile(item)($scope);

@@ -1,9 +1,12 @@
-﻿
+﻿"use strict";
+
+
 module.exports = {
     Tracks: function () { },
     Track:  function (key) {
-        var fs = require('fs');
-        var meta = require('musicmetadata');
+        const fs = require('fs');
+        const meta = require('musicmetadata');
+        const Guid = require('./Guid.js');
 
         this.title;     //str
         this.artist;    // [str]
@@ -45,16 +48,17 @@ module.exports = {
             if (Object.prototype.toString.call(items) === '[object Array]') {
                 if (items) {
                     for (var i = 0; i < items.length; i += 1) {
-                        if (this.List[items[i]] === undefined) {
-                            this.List[items[i]] = [];
+                        let key = Guid();
+                        if (this.List[key] === undefined) {
+                            this.List[key] = [];
                         }
-                        if(this.List[items[i]].indexOf(file) === -1){
-                            this.List[items[i]].push(file);
+                        if(this.List[key].indexOf(file) === -1){
+                            this.List[key].push(file);
                         }
                     }
                 }
             } else {
-                this.List[items] = items;
+                this.List[Guid()] = items;
             }
         }
         this.ToArray = function () {
