@@ -35,7 +35,7 @@ module.exports = {
         var progress = new Progress(callback);
 
         function isMusicTrack(file) {
-            return /\.(mp3|m4a|m4p)$/i.exec(file) !== null;
+            return /\.(mp3|m4a)$/i.exec(file) !== null;
         }
 
         function getChildDirectory(dir) {
@@ -75,7 +75,7 @@ module.exports = {
                                 next++;
                                 nextFile();
                             });
-                            tracks[trk.Key] = trk;
+                         //   tracks[trk.Key] = trk;
                         } else {
                             nextFile();
                         }

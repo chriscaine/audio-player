@@ -48,17 +48,16 @@ module.exports = {
             if (Object.prototype.toString.call(items) === '[object Array]') {
                 if (items) {
                     for (var i = 0; i < items.length; i += 1) {
-                        let key = Guid();
-                        if (this.List[key] === undefined) {
-                            this.List[key] = [];
+                        if (this.List[items[i]] === undefined) {
+                            this.List[items[i]] = [];
                         }
-                        if(this.List[key].indexOf(file) === -1){
-                            this.List[key].push(file);
+                        if(this.List[items[i]].indexOf(file) === -1){
+                            this.List[items[i]].push(file);
                         }
                     }
                 }
             } else {
-                this.List[Guid()] = items;
+                this.List[items] = items;
             }
         }
         this.ToArray = function () {

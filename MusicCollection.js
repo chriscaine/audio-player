@@ -1,16 +1,18 @@
-﻿var fs = require('fs');
-var Files = require('./Files.js');
-var Track = require('./Tracks.js')['Track'];
-var List = require('./Tracks.js')['List'];
-var Collection = require('./Collection.js');
-
+﻿"use strict";
+const fs = require('fs');
+const Files = require('./Files.js');
+const Track = require('./Tracks.js')['Track'];
+const List = require('./Tracks.js')['List'];
+const Collection = require('./Collection.js');
+const Guid = require('./Guid.js');
 var directory = JSON.parse(fs.readFileSync('config.json')).dir;
 
 var collection = new Collection();
 collection.Load();
 console.log('Library currently holds: ', Object.keys(collection.Tracks).length);
 Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata, file) {
-    collection.Tracks[file] = {
+    let guid = Guid();
+    collection.Tracks[guid] = {
         title: metadata.title,
         artist: metadata.artist,    // [str]
         albumartist: metadata.albumartist,   // [str]
@@ -21,9 +23,9 @@ Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metada
         disk: metadata.disk,
         file:file
     }
-    collection.Artists.Add(metadata.artist, file);
-    collection.Artists.Add(metadata.albumartist, file);
-    collection.Albums.Add(metadata.album, file);
+    collection.Artists.Add(metadata.artist, guid);
+    collection.Artists.Add(metadata.albumartist, guid);
+    collection.Albums.Add(metadata.album, guid);
     collection.Save();
 }, function () {
     console.log('SAVE DATA');
