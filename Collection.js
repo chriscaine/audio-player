@@ -1,9 +1,25 @@
 ﻿"use strict";
 module.exports = function Collection() {
-    var fs = require('fs');
-    var _this = this;
-    var List = require('./Tracks.js')['List'];
-    var playlistFile = 'data/current.json';
+    const fs = require('fs');
+    const _this = this;
+    const List = require('./Tracks.js')['List'];
+    const DataCollection = require('data-collection');
+    const playlistFile = 'data/current.json';
+    const dataSets = {
+        Tracks: null,
+        Artists: null,
+        Albums: null
+    };
+    var buildDataCollection = function () {
+        var tracks = [];
+        for (var key in _this.Tracks) {
+            tracks.push(_this.Tracks[key]);
+        }
+        dataSets.Tracks = new DataCollection(tracks);
+        dataSets.Albums = new DataCollection(_this.Albums.ToArrayWithKeys());
+        dataSets.Artists = new DataCollection(_this.Artists.ToArrayWithKeys());
+    }
+
     this.Tracks = {};
     this.Albums = new List();
     this.Artists = new List();
@@ -11,7 +27,25 @@ module.exports = function Collection() {
 
     this.CurrentId = null;
     this.CurrentIndex = -1;
+    this.Query = function (search) {
+       
+        if (dataSets.Tracks) {
+            if (typeof search === "string") {
+                return [dataSets.Albums.query().filter({ 'name__icontains': search }).values(),
+                        dataSets.Artists.query().filter({ 'name__icontains': search }).values(),
+                        dataSets.Tracks.query().filter({ 'title__icontains': search }).values()]
+            } else {
+                var searchObj = {};
+                searchObj[search[0] + '__icontains'] = search[1];
+                return [[],
+                        [],
+                     dataSets.Tracks.query().filter(searchObj).values()]
+            }
 
+        } else {
+            throw "DataSets not filled";
+        }
+    }
     this.GetNext = function () {
         let index;
         if (this.CurrentId === null) {
@@ -24,12 +58,12 @@ module.exports = function Collection() {
         return this.Playlist[index];
     }
     this.GetTrack = function (id) {
-            let index = this.Playlist.indexOf(id);
-            if (index > -1) {
-                this.CurrentId = id;
-                this.CurrentIndex = index;
-            }
-            return this.Tracks[id];
+        let index = this.Playlist.indexOf(id);
+        if (index > -1) {
+            this.CurrentId = id;
+            this.CurrentIndex = index;
+        }
+        return this.Tracks[id];
     }
 
     this.SyncPlaylist = function (playlist) {
@@ -52,27 +86,27 @@ module.exports = function Collection() {
         return result;
     }
     this.Load = function () {
-        
+
         var collection;
         try {
             collection = JSON.parse(fs.readFileSync('data/collection.json'));
             console.log('TRACKS: LOADED');
         } catch (e) {
             console.log('ERROR: ', e);
-            collection = { Albums: {}, Artists: {}, Tracks : {}}
+            collection = { Albums: {}, Artists: {}, Tracks: {} }
         }
 
         function _extend(original, extend) {
             for (var key in extend) {
-               original[key] = extend[key];
+                original[key] = extend[key];
             }
         }
 
-        _this.Albums = new List(collection.Albums);
-        _this.Artists = new List(collection.Artists);
+        _this.Albums = new List(collection.Albums.List);
+        _this.Artists = new List(collection.Artists.List);
         _this.Tracks = collection.Tracks;
-        
-        
+
+        buildDataCollection();
         try {
             let playlist = JSON.parse(fs.readFileSync(playlistFile));
             _this.SyncPlaylist(playlist.List);
@@ -82,7 +116,7 @@ module.exports = function Collection() {
         } catch (e) {
             console.log('ERROR: ', e);
         }
-        
+
     };
     this.Save = function () {
         try {

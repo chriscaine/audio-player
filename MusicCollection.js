@@ -10,6 +10,8 @@ var directory = JSON.parse(fs.readFileSync('config.json')).dir;
 var collection = new Collection();
 collection.Load();
 console.log('Library currently holds: ', Object.keys(collection.Tracks).length);
+
+
 Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata, file) {
     let guid = Guid();
     collection.Tracks[guid] = {

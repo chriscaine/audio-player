@@ -1,24 +1,14 @@
-﻿var fs = require('fs');
-var DataCollection = require('data-collection');
-var json;
-var data;
-try {
-    json = fs.readFileSync('data/collection.json');
-    data = JSON.parse(json);
-} catch (e) {
-    console.log(e);
-}
+﻿"use strict";
 
-var tracks = [];
+const Collection = require('./collection.js');
 
-for (var key in data.Tracks) {
-    tracks.push(data.Tracks[key]);
-}
-
-
-var dc = new DataCollection(tracks);
+var collection = new Collection();
+collection.Load();
 
 
 
-console.log(dc.query().filter({ 'artist__contains' : 'Dolly' }).order('track__no', true).values());
+console.log(collection.Query(['year', '1998']));
 
+
+//console.log(buildFilter(search));
+//console.log(dc.query().filter(buildFilter(search)).values());
