@@ -3,7 +3,7 @@
 
 module.exports = {
     Tracks: function () { },
-    Track:  function (key) {
+    Track: function (key) {
         const fs = require('fs');
         const meta = require('musicmetadata');
         const Guid = require('./Guid.js');
@@ -21,47 +21,49 @@ module.exports = {
         var _this = this;
         this.Fill = function (err, metadata) {
             if (err) { _this._failed = true; console.log(err); return; }
-         //   for (var key in _this) {
-           //     if (metadata[key]) { _this[key] = metadata[key]; }
-          //  }
-            //_this._file.dispose();
-           // console.log(_this.title);
             _this._callback(metadata);
         }
         this.Init = function (callback) {
             _this._callback = callback;
-            
+
             try {
                 meta(fs.createReadStream(_this.Key), _this.Fill);
             } catch (err) {
                 console.log('ERROR ON:', err);
             }
-            
+
         }
         return this;
     },
     List: function (data) {
-        this.List = data ? data : {};
-        this.Add = function (items, file) {
-            if (Object.prototype.toString.call(items) === '[object Array]') {
-                if (items) {
-                    for (var i = 0; i < items.length; i += 1) {
-                        if (this.List[items[i]] === undefined) {
-                            this.List[items[i]] = [];
-                        }
-                        if(this.List[items[i]].indexOf(file) === -1){
-                            this.List[items[i]].push(file);
-                        }
-                    }
-                }
-            } else {
-                this.List[items] = items;
+        const _this = this;
+        this.List = data  ? data : {};
+        this.Add = function (items, key) {
+            if (Object.prototype.toString.call(items) !== '[object Array]') {
+                items = [items];
             }
+            for (var i = 0; i < items.length; i += 1) {
+                if (this.List[items[i]] === undefined) {
+                    this.List[items[i]] = [];
+                }
+                if (this.List[items[i]].indexOf(key) === -1) {
+                    this.List[items[i]].push(key);
+                }
+            }
+
         }
         this.ToArray = function () {
             return Object.keys(this.List);
         }
-        var _this = this;
+        this.ToArrayWithKeys = function () {
+            var result = [];
+            for (var key in this.List) {
+                result.push({ 'name': key, 'ids': this.List[key] });
+            }
+            console.log(result);
+            return result;
+        }
+
         return this;
     }
 }
