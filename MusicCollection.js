@@ -13,6 +13,7 @@ console.log('Library currently holds: ', Object.keys(collection.Tracks).length);
 Files.GetFiles(directory, Files.GetTrackData(collection.Tracks, function (metadata, file) {
     let guid = Guid();
     collection.Tracks[guid] = {
+        id: guid,
         title: metadata.title,
         artist: metadata.artist,    // [str]
         albumartist: metadata.albumartist,   // [str]

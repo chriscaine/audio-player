@@ -95,7 +95,7 @@
 
 
 
-        app.controller('HomeController', function ($scope) {
+        app.controller('HomeController', function ($scope, $timeout) {
             var sortables = [];
             $('ul.tracks').each(function (index, item) {
                 var sortable = new Sortable(item, {
@@ -132,7 +132,9 @@
 
             socket.on('searchresult', function (data) {
                 console.log(data);
-                $scope.results = data.result;
+                $timeout(function () {
+                    $scope.results = data.result;
+                });
             });
         });
 

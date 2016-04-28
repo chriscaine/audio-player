@@ -30,13 +30,11 @@ module.exports = {
         }
         this.Init = function (callback) {
             _this._callback = callback;
-            _this._file = fs.createReadStream(_this.Key);
+            
             try {
-                meta(_this._file, _this.Fill);
-            } catch (e) {
-                console.log('ERROR ON:');
-                console.log(_this._file);
-                console.log(err);
+                meta(fs.createReadStream(_this.Key), _this.Fill);
+            } catch (err) {
+                console.log('ERROR ON:', err);
             }
             
         }

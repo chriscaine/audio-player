@@ -1,4 +1,5 @@
-﻿var Rx = require('rxjs/Rx');
+﻿"use strict";
+var Rx = require('rxjs/Rx');
 
 var fs = require('fs');
 var meta = require('musicmetadata');
