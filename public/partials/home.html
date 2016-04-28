@@ -7,7 +7,17 @@
     <div class="container">
         <div class="search-box">
             <ul class="tracks sortable">
-                <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results">
+                <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[0]">
+                    <span>{{a.name}}</span>
+                </li>
+            </ul>
+            <ul class="tracks sortable">
+                <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[1]">
+                    <span>{{a.name}}</span>
+                </li>
+            </ul>
+            <ul class="tracks sortable">
+                <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[2]">
                     <span>{{a.title}}</span>
                 </li>
             </ul>

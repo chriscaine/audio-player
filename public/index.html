@@ -113,6 +113,10 @@
                     group: 'sortable',
                     //handle: '.drag-handle',
                     onAdd: function (evt) {
+                        // if data id is array then create a set of items at position 
+                        // sync and 
+                        // thus get associated track data
+
                         $(evt.item).remove();
                         $(evt.target).append(evt.item);    
                     }
@@ -127,7 +131,7 @@
 
             var first = true;
             $scope.$watch('search', function (n, o, e) {
-                if (n) socket.emit('searchquery', ['title', n]);
+                if (n) socket.emit('searchquery', n);
             });
 
             socket.on('searchresult', function (data) {

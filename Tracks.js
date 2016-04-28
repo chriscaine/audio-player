@@ -60,7 +60,6 @@ module.exports = {
             for (var key in this.List) {
                 result.push({ 'name': key, 'ids': this.List[key] });
             }
-            console.log(result);
             return result;
         }
 
