@@ -8,6 +8,16 @@
             font-size: 10px;
             background: #e9e9e9;
         }
+        .container{
+            display:flex;
+            flex-direction:row;
+        }
+        .playlist-container, .search-container{
+            flex-shrink:0;
+            flex-basis: 300px;
+            flex-grow:1;
+        }
+        
 
         h1, h2 {
             font-family: sans-serif;
@@ -22,8 +32,8 @@
         }
 
         .search-box {
-            display: inline-block;
-            width: 30%;
+            display: block;
+            width: auto;
             background: #fff;
             border: 1px solid #e5e5e5;
             border-radius: 4px;
@@ -32,8 +42,8 @@
         }
 
         .playlist-box {
-            display: inline-block;
-            width: 30%;
+            display: block;
+            width: auto;
             vertical-align: top;
             background: #666;
             border: 1px solid #e5e5e5;
@@ -65,7 +75,54 @@
 
 
 
-    <div multi-view="main"></div>
+<div ng-controller="HomeController">
+    <div>
+    <div class="controls">
+        <input class="transport-control" type="button" value="{{CTRLS.PLAY}}" data-id="1" />
+        <input class="transport-control" type="button" value="{{CTRLS.PAUSE}}" />
+        <input class="transport-control" type="button" value="{{CTRLS.STOP}}" />
+        <input class="transport-control" type="button" value="{{CTRLS.STOPAFTER}}" />
+    </div>
+    <div class="container">
+
+
+        <div class="search-container">
+
+            <input type="text" ng-model="search"/>
+            <input type="button" value="Search" ng-click="searchClick()"/>
+            <div class="">
+                <div class="search-box">
+                    <ul class="tracks sortable">
+                        <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[0]">
+                            <span>{{a.name}}</span>
+                        </li>
+                    </ul>
+                    <ul class="tracks sortable">
+                        <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[1]">
+                            <span>{{a.name}}</span>
+                        </li>
+                    </ul>
+                    <ul class="tracks sortable">
+                        <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[2]">
+                            <span>{{a.title}}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+
+         <div class="playlist-container">
+                <div class="playlist-box">
+                    <ul class="playlist"></ul>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+</div>
 
     <script src="js/lib/jquery-1.7.1.min.js"></script>
     <script src="js/lib/rx.all.min.js"></script>
@@ -75,24 +132,10 @@
     <script>
         angular.module('core', []);
     </script>
-    <script src="js/filters/filterArtist.js"></script>
-    <script src="js/providers/apiProvider.js"></script>
-    <script src="js/providers/routeProvider.js"></script>
-    <script src="js/directives/directiveMultiView.js"></script>
-    <script src="js/services/serviceTemplate.js"></script>
     <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 <script>
         var app = angular.module('app', ['core', 'rx']);
         var socket = io.connect('http://localhost:8080/');
-        app.config(function (routeProvider) {
-
-            routeProvider.when('/home', 'main', { templateUrl: '/partials/home.html', controller: 'HomeController' });
-            console.log('config');
-        });
-        app.run(function (route) {
-            console.log('run');
-        });
-    
     
      
 
@@ -163,49 +206,15 @@
             socket.on('search:result', function (data) {
                 console.log(data);
                 $timeout(function () {
+                    //  ====>
+                    /*
+                     *  Need to write a module to draw lists
+                     *
+                     */
                     $scope.results = data.result;
                 });
             });
         });
-
-
-
-
-
-
-        /* SORTABLES
-                       $element.find('ul.sortable').each(function (index, item) {
-                    var sortable = new Sortable(item, {
-                        group: 'sortable',
-                        handle: '.drag-handle',
-                        onAdd: function (evt) {
-                            if (!evt.item.classList.contains('set-item')) {
-                                $(evt.item).remove();
-                                var item = addListItem(evt.item.getAttribute('data-directive'));
-                                $timeout(function () {
-                                    $compile(item)($scope);
-                                    $(evt.target).append(item);
-                                });
-                            }
-                            $('li').removeClass('sortable-chosen');
-                        }
-                    });
-                    sortables.push(sortable);
-                });
-                // initialise sortable functionality on Parts List - differs from others
-                $element.find('.parts-list ul').each(function (index, item) {
-                    var sortable = new Sortable(item, {
-                        group: {
-                            name: 'sortable',
-                            pull: 'clone',
-                            put: false
-                        }
-                    });
-                    sortables.push(sortable);
-                });
-
-
-        */
 
     </script>
 </body>
