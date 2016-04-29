@@ -81,7 +81,7 @@
     <script src="js/directives/directiveMultiView.js"></script>
     <script src="js/services/serviceTemplate.js"></script>
     <script src="http://localhost:8080/socket.io/socket.io.js"></script>
-    <script>
+<script>
         var app = angular.module('app', ['core', 'rx']);
         var socket = io.connect('http://localhost:8080/');
         app.config(function (routeProvider) {
@@ -92,11 +92,30 @@
         app.run(function (route) {
             console.log('run');
         });
-
-
+    
+    
+     
 
         app.controller('HomeController', function ($scope, $timeout) {
             var sortables = [];
+            
+            $scope.CTRLS = {
+                PLAY: 'PLAY',
+                PAUSE:'PAUSE',
+                STOP: 'STOP',
+                STOPAFTER: 'STOPAFTER'
+            }
+            
+            var transport$ = Rx.Observable.fromEvent($('.transport-control'), 'click').map(function (e) {
+                return { type: e.target.value, data : e.target.dataset };
+            });;
+          
+            transport$.subscribe(function (e) {
+         
+             socket.emit('transport', e);
+            })
+
+
             $('ul.tracks').each(function (index, item) {
                 var sortable = new Sortable(item, {
                     group: {
@@ -116,25 +135,32 @@
                         // if data id is array then create a set of items at position 
                         // sync and 
                         // thus get associated track data
-
+                        
                         $(evt.item).remove();
-                        $(evt.target).append(evt.item);    
+                        $(evt.target).append(evt.item);
+                        var playlist = [];
+                        $('ul.playlist li').each(function (index, item) {
+                              playlist.push(item.dataset.id);
+                        });
+                        
+                        socket.emit('playlist:sync', playlist);
+
                     }
                 });
                 console.log(sortable);
                 sortables.push(sortable);
             });
             $scope.searchClick = function () {
-                socket.emit('searchquery', ['title', $scope.search]);
+                socket.emit('search:query', ['title', $scope.search]);
 
             }
 
             var first = true;
             $scope.$watch('search', function (n, o, e) {
-                if (n) socket.emit('searchquery', n);
+                if (n) socket.emit('search:query', n);
             });
 
-            socket.on('searchresult', function (data) {
+            socket.on('search:result', function (data) {
                 console.log(data);
                 $timeout(function () {
                     $scope.results = data.result;

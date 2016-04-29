@@ -2,6 +2,13 @@
 
 <div>
     <h1>Home</h1>
+
+    <div style="margin:20px;">
+        <input class="transport-control" type="button" value="{{CTRLS.PLAY}}" data-id="1" />
+        <input class="transport-control" type="button" value="{{CTRLS.PAUSE}}"/>
+        <input class="transport-control" type="button" value="{{CTRLS.STOP}}"/>
+        <input class="transport-control" type="button" value="{{CTRLS.STOPAFTER}}" />
+    </div>
     <input type="text" ng-model="search" />
     <input type="button" value="Search" ng-click="searchClick()" />
     <div class="container">
