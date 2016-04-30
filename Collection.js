@@ -52,7 +52,7 @@ module.exports = function Collection() {
             index = 0;
         } else {
             index = this.Playlist.indexOf(this.CurrentId);
-            if (index === -1) index = this.CurrentIndex;
+            if (index === -1) index = 0;//this.CurrentIndex;
             index += 1;
         }
         return this.Playlist[index];
@@ -111,8 +111,8 @@ module.exports = function Collection() {
         try {
             let playlist = JSON.parse(fs.readFileSync(playlistFile));
             _this.SyncPlaylist(playlist.List);
-            _this.CurrentId(playlist.Id);
-            _this.CurrentIndex(playlist.Index);
+            _this.CurrentId = playlist.Id;
+            _this.CurrentIndex = playlist.Index;
             console.log('PLAYLIST: LOADED');
         } catch (e) {
             console.log('ERROR: ', e);
@@ -129,7 +129,7 @@ module.exports = function Collection() {
     };
     this.SavePlaylist = function () {
         try {
-            fs.writeFileSync(playlistFile, JSON.stringify({ List: _this.Playlist, Id: _this.CurrentId, Index: _this.CurrentIndex }));
+            fs.writeFileSync(playlistFile, JSON.stringify({ List: _this.Playlist, Id: _this.CurrentId, Index: 0 }));
             console.log('SAVED: PLAYLIST');
         } catch (e) {
             console.log(e);
