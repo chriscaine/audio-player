@@ -4,20 +4,17 @@ module.exports = function App(io, player, collection) {
     const _player = player;
     const _collection = collection;
     this.Play = function (data) {
-        console.log('play');
         let id;
         if (data && data.id) {
-		console.log('play by id');
             id = data.id;
-	    _player.Stop();
+            if (_player) _player.Stop();
             // play selected
         } else {
-		console.log('get from playlist');
             id = _collection.GetNext();
             // play next
         }
 	let track = _collection.GetTrack(id);
-			console.log(track);
+			console.log('PLAYING: ', track.title);
      if(_player && track)  _player.Play(track.file);
      if (_player) _player.on('end', this.Play);
     }
@@ -37,7 +34,7 @@ module.exports = function App(io, player, collection) {
 
     this.PlaylistSync = function (playlist) {
         _collection.SyncPlaylist(playlist);
-        _io.emit('playlist:tracksubset', _collection.GetSubset());
+      //  _io.emit('playlist:tracksubset', _collection.GetSubset());
     }
 
     return this;

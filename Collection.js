@@ -31,15 +31,17 @@ module.exports = function Collection() {
        
         if (dataSets.Tracks) {
             if (typeof search === "string") {
-                return [dataSets.Albums.query().filter({ 'name__icontains': search }).values(),
-                        dataSets.Artists.query().filter({ 'name__icontains': search }).values(),
-                        dataSets.Tracks.query().filter({ 'title__icontains': search }).values()]
+                //return [dataSets.Albums.query().filter({ 'name__icontains': search }).values(),
+                //        dataSets.Artists.query().filter({ 'name__icontains': search }).values(),
+                //        dataSets.Tracks.query().filter({ 'title__icontains': search }).values()]
+                return dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
             } else {
                 var searchObj = {};
                 searchObj[search[0] + '__icontains'] = search[1];
-                return [[],
-                        [],
-                     dataSets.Tracks.query().filter(searchObj).values()]
+                //return [[],
+                //        [],
+                //     dataSets.Tracks.query().filter(searchObj).values()]
+                return dataSets.Tracks.query().filter(searchObj).values();
             }
 
         } else {
