@@ -4,12 +4,12 @@ const Express = require('express');
 const express = Express();
 const http = require('http').Server(express);
 const io = require('socket.io')(http);
-//const Player = require('./Player.js');
+const Player = require('./Player.js');
 const App = require('./App.js');
 const Collection = require('./Collection.js');
 const CTRLS = require('./Enums.js').CTRLS;
 const collection = new Collection();
-const player = null; //new Player();
+const player = new Player();
 const app = new App(io, player, collection);
 
 express.use(Express.static('public'));

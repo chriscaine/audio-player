@@ -78,7 +78,7 @@
 <div ng-controller="HomeController">
     <div>
     <div class="controls">
-        <input class="transport-control" type="button" value="{{CTRLS.PLAY}}" data-id="1" />
+        <input class="transport-control" type="button" value="{{CTRLS.PLAY}}" />
         <input class="transport-control" type="button" value="{{CTRLS.PAUSE}}" />
         <input class="transport-control" type="button" value="{{CTRLS.STOP}}" />
         <input class="transport-control" type="button" value="{{CTRLS.STOPAFTER}}" />
@@ -104,7 +104,7 @@
                     </ul>
                     <ul class="tracks sortable">
                         <li data-id="{{a.id}}" class="sortable" ng-repeat="a in results[2]">
-                            <span>{{a.title}}</span>
+                            {{a.title}} 
                         </li>
                     </ul>
                 </div>
@@ -132,10 +132,10 @@
     <script>
         angular.module('core', []);
     </script>
-    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script src="http://192.168.1.11:8080/socket.io/socket.io.js"></script>
 <script>
         var app = angular.module('app', ['core', 'rx']);
-        var socket = io.connect('http://localhost:8080/');
+        var socket = io.connect('http://192.168.1.11:8080/');
     
      
 
@@ -179,8 +179,9 @@
                         // sync and 
                         // thus get associated track data
                         
+			console.log(evt);
+                        $(evt.target).append($('<li />', { 'data-id': evt.item.dataset.id }).text(evt.item.innerText));
                         $(evt.item).remove();
-                        $(evt.target).append(evt.item);
                         var playlist = [];
                         $('ul.playlist li').each(function (index, item) {
                               playlist.push(item.dataset.id);

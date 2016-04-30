@@ -5,15 +5,20 @@ module.exports = function App(io, player, collection) {
     const _collection = collection;
     this.Play = function (data) {
         console.log('play');
-        let track;
+        let id;
         if (data && data.id) {
-            track = _collection.GetTrack(data.id);
+		console.log('play by id');
+            id = data.id;
+	    _player.Stop();
             // play selected
         } else {
-            track = _collection.GetNext();
+		console.log('get from playlist');
+            id = _collection.GetNext();
             // play next
         }
-     if(_player)  _player.Play(track);
+	let track = _collection.GetTrack(id);
+			console.log(track);
+     if(_player && track)  _player.Play(track.file);
      if (_player) _player.on('end', this.Play);
     }
     this.Pause = function (data) {

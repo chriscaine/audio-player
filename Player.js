@@ -14,6 +14,7 @@ const Player = function() {
 	var passThru$ = new stream.PassThrough();
 	var reader;
 	var speaker;
+
 	this.events = {};
 	this.on = function(name, fn) {
 		var _this = this;
@@ -29,6 +30,9 @@ const Player = function() {
 			passThru$.pause();
 		}
 	}
+	this.Stop = function() {
+		destroy();
+	}
 
 	var format = function(format) {
 		speaker = new Speaker(format);
@@ -37,6 +41,7 @@ const Player = function() {
 	}
 
 	var destroy = function() {
+		passThru$.unpipe();
 		reader = null;
 		passThru$ = null;
 		speaker = null;
@@ -48,14 +53,14 @@ const Player = function() {
 	var decoded = function() {if(_this.events['decoded']) { _this.events['decoded']();}}
 	
 	this.Play = function(file) {
+		passThru$.unpipe();
 		reader = null;
 		passThru$ = null;
 		speaker = null;
-		console.log('Playing: ', file);
 		var _this = this;
 		passThru$ = new stream.PassThrough();
-		passThru$.on('data', function(chunk) { console.log(chunk);});
-		ffmpeg('test.m4a').audioCodec('pcm_s16le').audioChannels(2).audioFrequency(44100).format('wav').on('codecData', function(data) { })
+		//passThru$.on('data', function(chunk) { console.log(chunk);});
+		ffmpeg(file).audioCodec('pcm_s16le').audioChannels(2).audioFrequency(44100).format('wav')
 			.on('error', error)
 			.on('progress', progress)
 			.on('end', decoded).pipe(passThru$);
