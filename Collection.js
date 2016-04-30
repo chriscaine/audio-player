@@ -68,10 +68,11 @@ module.exports = function Collection() {
 
     this.SyncPlaylist = function (playlist) {
         let max = playlist.length;
-        while (this.Playlist.length) this.Playlist.Pop();
+        while (this.Playlist.length) this.Playlist.pop();
         for (let i = 0; i < max; i += 1) {
             this.Playlist.push(playlist[i]);
         }
+        this.SavePlaylist();
     }
     this.GetSubset = function (ids) {
         if (ids === undefined) ids = this.Playlist;
