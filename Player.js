@@ -41,7 +41,7 @@ const Player = function() {
 	}
 
 	var destroy = function() {
-		passThru$.unpipe();
+	 	if(passThru$) passThru$.unpipe();
 		reader = null;
 		passThru$ = null;
 		speaker = null;
@@ -53,7 +53,7 @@ const Player = function() {
 	var decoded = function() {if(_this.events['decoded']) { _this.events['decoded']();}}
 	
 	this.Play = function(file) {
-		passThru$.unpipe();
+		if(passThru$) passThru$.unpipe();
 		reader = null;
 		passThru$ = null;
 		speaker = null;

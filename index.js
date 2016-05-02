@@ -27,7 +27,7 @@ io.on('connection', function (socket) {
         Playlist: collection.Playlist,
         Tracks : collection.GetSubset()
     });
-
+    
     var searchQuery$ = Rx.Observable.fromEvent(socket, 'search:query');
 
     searchQuery$.subscribe(function (search) {
@@ -51,6 +51,7 @@ io.on('connection', function (socket) {
     stopAfter$.subscribe(app.StopAfter);
 
     playlistSync$.subscribe(app.PlaylistSync);
-
+    
+    app.OnConnection();
 
 });

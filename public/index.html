@@ -27,10 +27,11 @@
     <div class="header">
 
         <div class="controls ">
-            <button class="transport-control btn btn-success glyphicon glyphicon-play" type="button" data-type="{{CTRLS.PLAY}}"></button>
-            <button class="transport-control btn btn-default glyphicon glyphicon-pause" type="button" data-type="{{CTRLS.PAUSE}}"></button>
-            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="{{CTRLS.STOP}}"></button>
-            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="{{CTRLS.STOPAFTER}}"></button>
+            <button class="transport-control btn btn-success glyphicon glyphicon-play" type="button" data-type="PLAY"></button>
+            <button class="transport-control btn btn-default glyphicon glyphicon-pause" type="button" data-type="PAUSE"></button>
+            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOP"></button>
+            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOPAFTER"></button>
+	    <span id="now-playing"></span>
         </div>
 
     </div>
@@ -145,14 +146,19 @@
         var syncRequest$ = new Rx.Subject();
         syncRequest$.throttle(2000).subscribe(playlist.Sync);
 
-        var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input').map(function (e) { return e.target.value; });
+        var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
+				.map(function (e) { return e.target.value; })
+				.filter(function(e) { return e.length > 2;})
+				.throttle(300);
         var transport$ = Rx.Observable.fromEvent($('.transport-control'), 'click');
 
         var sortables = [];
 
 
         transport$.subscribe(transportClick);
-
+	socket.on('transport:now-playing', function(track) {
+		$('#now-playing').text(track.title + ' by ' + track.artist[0]);
+	});
 
         $('ul.tracks').each(function (index, item) {
             var sortable = new Sortable(item, {

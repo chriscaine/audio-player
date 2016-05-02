@@ -67,7 +67,9 @@ module.exports = function Collection() {
         }
         return this.Tracks[id];
     }
-
+    this.GetCurrent = function() {
+	return _this.Tracks[_this.CurrentId];
+	}
     this.SyncPlaylist = function (playlist) {
         let max = playlist.length;
         while (this.Playlist.length) this.Playlist.pop();
