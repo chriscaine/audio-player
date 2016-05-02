@@ -9,17 +9,31 @@
             user-select: none;
         }
 
-        li {
+        li.list-group-item.list-group-item {
             cursor: pointer;
-        }
-
-        .playlist li {
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: flex-end;
         }
 
-    
+            li .track-label {
+                align-self: center;
+                flex-basis: 100%;
+            }
+
+            li button {
+            }
+            .playing {
+                display:none;
+            }
+        
+
+        .now-playing .playing {
+            display:block;
+        }
+        .now-playing .play {
+            display:none;
+        }
     </style>
 </head>
 <body class="" style="">
@@ -31,7 +45,7 @@
             <button class="transport-control btn btn-default glyphicon glyphicon-pause" type="button" data-type="PAUSE"></button>
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOP"></button>
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOPAFTER"></button>
-	    <span id="now-playing"></span>
+            <span id="now-playing"></span>
         </div>
 
     </div>
@@ -64,12 +78,45 @@
             </div>
         </div>
     </div>
+    <script id="track" type="text/template">
+        <li class="list-group-item" data-id="{{id}}">
+            <div class="track-label">{{title}} by {{ artist }}<br />Year {{year}} Track {{track.no}} of {{track.of}}</div>
+            <span>
+                <button class="btn btn-default">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </span>
+            <span class="playing glyphicon glyphicon-play-circle" style="color:green;"></span>
+            <span class="play">
+                <button class="btn btn-success transport-control"
+                        data-id="{{id}}"
+                        data-type="PLAY">
+                   
+                    <span class="glyphicon glyphicon-play"></span>
+                </button>
+            </span>
+        </li>
+    </script>
 
+    <script src="js/lib/mustache.min.js"></script>
     <script src="js/lib/jquery-1.7.1.min.js"></script>
     <script src="js/lib/rx.all.min.js"></script>
     <script src="js/lib/Sortable.js"></script>
     <script src="http://192.168.1.11:8080/socket.io/socket.io.js"></script>
     <script>
+
+        var View = function (template) {
+            var template = $('#' + template).html();
+            Mustache.parse(template);   // optional, speeds up future uses
+            this.Render = function (model) {
+                return Mustache.render(template, model);
+            }
+        }
+
+        var trackItemView = new View('track');
+
+
+
         var socket = io.connect('http://192.168.1.11:8080/');
         var transportClick = function (e) {
             console.log(e);
@@ -94,24 +141,48 @@
                 }
             }
             this.GetElement = function (track) {
-                var button = $('<button />', { 'class': 'btn btn-success transport-control', 'data-id': track.id, 'data-type': CTRLS.PLAY });
-                button.append($('<span />', { 'class': 'glyphicon glyphicon-play' }));
-                button.on('click', transportClick)
-                return $('<li />', { 'class': 'list-group-item', 'data-id': track.id })
-                            .append($('<span />').html(track.title))
-                            .append(button);
+                var id = track.id;
+                var el = $('<li />', { 'class': 'list-group-item', 'data-id': track.id });
+
+                var buttonDelete = $('<button />', { 'class': 'btn btn-default glyphicon glyphicon-trash' });
+                buttonDelete.on('click', function () {
+                    var _id = id;
+                    var _el = el;
+                    _el.remove();
+                    _this.Update();
+                });
+                var buttonPlay = $('<button />', { 'class': 'btn btn-success transport-control', 'data-id': track.id, 'data-type': CTRLS.PLAY });
+
+                buttonPlay.append($('<span />', { 'class': 'glyphicon glyphicon-play' }));
+
+                buttonPlay.on('click', transportClick);
+
+                el.append($('<span />').html(track.title))
+                           .append(buttonPlay);
+                el.append(buttonDelete);
+                return el;
+            }
+            this.NowPlaying = function (id) {
+                this.El.find('li').removeClass('now-playing').each(function (i, item) {
+                    if ($(item).attr('data-id') === id) $(item).addClass('now-playing');
+                });
             }
 
             this.Draw = function (tracks) {
                 this.El.empty();
                 var max = this.Items.length;
                 for (var i = 0; i < max; i += 1) {
-                    this.El.append(this.GetElement(tracks[this.Items[i]]));
+                    // this.El.append(this.GetElement(tracks[this.Items[i]]));
+                    this.El.append(trackItemView.Render(tracks[this.Items[i]]));
                 }
             }
             this.Sync = function () {
                 console.log(this, _this);
                 socket.emit('playlist:sync', _this.Items);
+            }
+            this.Update = function () {
+                // update playlist from view
+                throw "Not IMplimented";
             }
         }
 
@@ -136,7 +207,8 @@
                 var max = result.length;
                 element.empty();
                 for (var i = 0; i < max; i += 1) {
-                    element.append(this.GetElement(result[i]));
+                    element.append(trackItemView.Render(result[i]));
+                    //element.append(this.GetElement(result[i]));
                 }
             }
         };
@@ -148,7 +220,7 @@
 
         var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
 				.map(function (e) { return e.target.value; })
-				.filter(function(e) { return e.length > 2;})
+				.filter(function (e) { return e.length > 2; })
 				.throttle(300);
         var transport$ = Rx.Observable.fromEvent($('.transport-control'), 'click');
 
@@ -156,9 +228,10 @@
 
 
         transport$.subscribe(transportClick);
-	socket.on('transport:now-playing', function(track) {
-		$('#now-playing').text(track.title + ' by ' + track.artist[0]);
-	});
+        socket.on('transport:now-playing', function (track) {
+            $('#now-playing').text(track.title + ' by ' + track.artist[0]);
+            playlist.NowPlaying(track.id);
+        });
 
         $('ul.tracks').each(function (index, item) {
             var sortable = new Sortable(item, {
@@ -176,27 +249,13 @@
                 group: 'sortable',
                 //handle: '.drag-handle',
                 onAdd: function (evt) {
-                    var id = evt.item.dataset.id;
-                    if (id && id.length === 36) {
+                    var _playlist = [];
+                    $('ul.playlist li').each(function (index, item) {
+                        _playlist.push(item.dataset.id);
+                    });
 
-                        var track = tracks.Items[id];
-                        console.log(tracks, id);
-                        if (track) {
-
-
-                            $(evt.target).append(playlist.GetElement(track));
-                            $(evt.item).remove();
-                            var _playlist = [];
-                            $('ul.playlist li').each(function (index, item) {
-                                _playlist.push(item.dataset.id);
-                            });
-
-                            playlist.Fill(_playlist);
-                            syncRequest$.onNext(true);
-                        } else {
-                            throw "Found no track data";
-                        }
-                    }
+                    playlist.Fill(_playlist);
+                    syncRequest$.onNext(true);
                 },
                 onUpdate: function () {
                     var _playlist = [];
