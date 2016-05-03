@@ -8,6 +8,21 @@
         * {
             user-select: none;
         }
+        .header {
+            height:12vh;
+        }
+        .well.well {
+            min-height:unset;
+            padding:0 20px 0 20px;
+            margin:0 20px 0 20px;
+        }
+        ul {
+            height: 85vh;
+            overflow:auto;
+            background-color: #e7e7e7;
+            border: solid 1px #e5e5e5;
+            border-radius: 3px;
+        }
 
         li.list-group-item.list-group-item {
             cursor: pointer;
@@ -16,61 +31,68 @@
             justify-content: flex-end;
         }
 
-            li .track-label {
-                align-self: center;
-                flex-basis: 100%;
-            }
+        li .track-label {
+            align-self: center;
+            flex-basis: 100%;
+        }
 
-            li button {
-            }
-            .playing {
-                display:none;
-            }
-        
+
+        .btn-wrapper {
+            padding-left: 5px;
+        }
+
+        .playing {
+            display: none;
+        }
+
+        .tracks .btn {
+            display: none;
+        }
 
         .now-playing .playing {
-            display:block;
+            display: block;
         }
+
         .now-playing .play {
-            display:none;
+            display: none;
         }
     </style>
 </head>
 <body class="" style="">
 
     <div class="header">
-
+   <div class="well">
         <div class="controls ">
             <button class="transport-control btn btn-success glyphicon glyphicon-play" type="button" data-type="PLAY"></button>
             <button class="transport-control btn btn-default glyphicon glyphicon-pause" type="button" data-type="PAUSE"></button>
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOP"></button>
-            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOPAFTER"></button>
-            <span id="now-playing"></span>
-        </div>
+            <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" title="Stop playlist at end of track" data-type="STOPAFTER"></button>
 
+            <span class="btn btn-default" id="now-playing"></span>
+            <button class="btn btn-danger glyphicon glyphicon-off pull-right" title="Shutdown System" type="button" data-type="SHUTDOWN"></button> 
+             <button class="btn btn-alert glyphicon glyphicon-trash pull-right" title="Empty Playlist" type="button" data-type="REMOVE"></button>
+           
+        </div>
+       <br/>
+            <div class="input-group">
+                <input id="txtSearch" class="form-control" type="text" ng-model="search" placeholder="Search for tracks..." />
+                <span class="input-group-btn">
+                    <button id="btnSearch" class="btn btn-default glyphicon glyphicon-search" type="button" value="Search"></button>
+                </span>
+            </div>
+            <!-- /input-group -->
+        </div>
+    <!-- /well -->
     </div>
     <div class="lists">
         <div class="container-fluid">
             <div class="row">
-
-
                 <div class="col-xs-6">
-                    <div class="well">
-                        <div class="input-group">
-                            <input id="txtSearch" class="form-control" type="text" ng-model="search" placeholder="Search for tracks..." />
-                            <span class="input-group-btn">
-                                <button id="btnSearch" class="btn btn-default" type="button" value="Search">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                            </span>
-                        </div><!-- /input-group -->
-                    </div><!-- /well -->
                     <div class="">
                         <ul id="tracks" class="tracks sortable list-group"></ul>
                     </div>
                 </div>
                 <div class="col-xs-6">
-                    <h2>Playlist</h2>
                     <div class="playlist-box">
                         <ul id="playlist" class="playlist list-group"></ul>
                     </div>
@@ -80,19 +102,19 @@
     </div>
     <script id="track" type="text/template">
         <li class="list-group-item" data-id="{{id}}">
-            <div class="track-label">{{title}} by {{ artist }}<br />Year {{year}} Track {{track.no}} of {{track.of}}</div>
-            <span>
-                <button class="btn btn-default">
-                    <span class="glyphicon glyphicon-trash"></span>
+            <div class="track-label">{{title}} by {{ artist }}<br />
+                Year {{year}} Track {{track.no}} of {{track.of}}</div>
+            <span class="btn-wrapper">
+                <button data-type="REMOVE"
+                    data-id="{{id}}"
+                    class="btn btn-default glyphicon glyphicon-trash">
                 </button>
             </span>
-            <span class="playing glyphicon glyphicon-play-circle" style="color:green;"></span>
-            <span class="play">
-                <button class="btn btn-success transport-control"
-                        data-id="{{id}}"
-                        data-type="PLAY">
-                   
-                    <span class="glyphicon glyphicon-play"></span>
+            <span class="playing btn glyphicon glyphicon-play-circle" style="color: green;"></span>
+            <span class="play btn-wrapper">
+                <button data-type="PLAY"
+                    data-id="{{id}}"
+                    class="btn btn-success transport-control glyphicon glyphicon-play">
                 </button>
             </span>
         </li>
@@ -103,7 +125,7 @@
     <script src="js/lib/rx.all.min.js"></script>
     <script src="js/lib/Sortable.js"></script>
     <script src="http://192.168.1.11:8080/socket.io/socket.io.js"></script>
-    <script>
+<script>
 
         var View = function (template) {
             var template = $('#' + template).html();
@@ -115,18 +137,28 @@
 
         var trackItemView = new View('track');
 
-
-
         var socket = io.connect('http://192.168.1.11:8080/');
-        var transportClick = function (e) {
-            console.log(e);
-            socket.emit('transport', e.target.dataset);
-        }
         var CTRLS = {
             PLAY: 'PLAY',
             PAUSE: 'PAUSE',
             STOP: 'STOP',
-            STOPAFTER: 'STOPAFTER'
+            STOPAFTER: 'STOPAFTER',
+            REMOVE: 'REMOVE',
+            SHUTDOWN : 'SHUTDOWN'
+        }
+
+        function byTag(tag) {
+            var _tag = tag;
+            return function (e) {
+                return e.target.tagName === tag.toUpperCase();
+            }
+        }
+
+        function byDataType(type) {
+            var _type = type;
+            return function (data) {
+                return data.type === _type;
+            }
         }
 
         var Playlist = function (element) {
@@ -140,28 +172,6 @@
                     this.Items.push(playlist[i]);
                 }
             }
-            this.GetElement = function (track) {
-                var id = track.id;
-                var el = $('<li />', { 'class': 'list-group-item', 'data-id': track.id });
-
-                var buttonDelete = $('<button />', { 'class': 'btn btn-default glyphicon glyphicon-trash' });
-                buttonDelete.on('click', function () {
-                    var _id = id;
-                    var _el = el;
-                    _el.remove();
-                    _this.Update();
-                });
-                var buttonPlay = $('<button />', { 'class': 'btn btn-success transport-control', 'data-id': track.id, 'data-type': CTRLS.PLAY });
-
-                buttonPlay.append($('<span />', { 'class': 'glyphicon glyphicon-play' }));
-
-                buttonPlay.on('click', transportClick);
-
-                el.append($('<span />').html(track.title))
-                           .append(buttonPlay);
-                el.append(buttonDelete);
-                return el;
-            }
             this.NowPlaying = function (id) {
                 this.El.find('li').removeClass('now-playing').each(function (i, item) {
                     if ($(item).attr('data-id') === id) $(item).addClass('now-playing');
@@ -169,11 +179,23 @@
             }
 
             this.Draw = function (tracks) {
-                this.El.empty();
-                var max = this.Items.length;
+                _this.El.empty();
+                var max = _this.Items.length;
                 for (var i = 0; i < max; i += 1) {
                     // this.El.append(this.GetElement(tracks[this.Items[i]]));
-                    this.El.append(trackItemView.Render(tracks[this.Items[i]]));
+                    _this.El.append(trackItemView.Render(tracks[_this.Items[i]]));
+                }
+            }
+            this.Remove = function (id) {
+                if (id) {
+                    var index = _this.Items.indexOf(id);
+                    if (index > -1) {
+                        _this.Items.splice(index, 1);
+                    }
+                } else {
+                    if (confirm('Are you sure you want to empty the playlist?')) {
+                        while (_this.Items.length) _this.Items.pop();
+                    }
                 }
             }
             this.Sync = function () {
@@ -182,7 +204,7 @@
             }
             this.Update = function () {
                 // update playlist from view
-                throw "Not IMplimented";
+                throw "Not Implimented";
             }
         }
 
@@ -222,17 +244,22 @@
 				.map(function (e) { return e.target.value; })
 				.filter(function (e) { return e.length > 2; })
 				.throttle(300);
-        var transport$ = Rx.Observable.fromEvent($('.transport-control'), 'click');
-
-        var sortables = [];
 
 
-        transport$.subscribe(transportClick);
-        socket.on('transport:now-playing', function (track) {
-            $('#now-playing').text(track.title + ' by ' + track.artist[0]);
-            playlist.NowPlaying(track.id);
+        var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(byTag('button')).map(function (e) { return e.target.dataset; });
+
+        var transport$ = allClickEvents$.filter(function (data) { return data.type !== CTRLS.REMOVE; });// Rx.Observable.fromEvent($('.transport-control'), 'click');
+
+        var removeItemClick$ = allClickEvents$.filter(byDataType(CTRLS.REMOVE));
+        removeItemClick$.subscribe(function (data) {
+            playlist.Remove(data.id);
+            playlist.Draw(tracks.Items);
+            playlist.Sync();
         });
 
+        transport$.subscribe(function (data) { socket.emit('transport', data); });
+
+        var sortables = [];
         $('ul.tracks').each(function (index, item) {
             var sortable = new Sortable(item, {
                 group: {
@@ -271,9 +298,15 @@
             sortables.push(sortable);
         });
 
-
         searchRequest$.subscribe(function (value) {
             socket.emit('search:query', ['title', value]);
+        });
+
+        socket.on('transport:now-playing', function (track) {
+            if (track) {
+                $('#now-playing').text(track.title + ' by ' + track.artist[0]);
+                playlist.NowPlaying(track.id);
+            }
         });
 
         socket.on('playlist:load', function (data) {

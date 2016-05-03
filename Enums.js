@@ -3,6 +3,7 @@
         PLAY: 'PLAY',
         PAUSE:'PAUSE',
         STOP: 'STOP',
-        STOPAFTER: 'STOPAFTER'
+        STOPAFTER: 'STOPAFTER',
+        SHUTDOWN: 'SHUTDOWN'
     }
 }
