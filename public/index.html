@@ -124,7 +124,7 @@
     <script src="js/lib/jquery-1.7.1.min.js"></script>
     <script src="js/lib/rx.all.min.js"></script>
     <script src="js/lib/Sortable.js"></script>
-    <script src="http://192.168.1.11:8080/socket.io/socket.io.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 <script>
 
         var View = function (template) {
@@ -137,7 +137,7 @@
 
         var trackItemView = new View('track');
 
-        var socket = io.connect('http://192.168.1.11:8080/');
+        var socket = io.connect('http://localhost:8080/');
         var CTRLS = {
             PLAY: 'PLAY',
             PAUSE: 'PAUSE',
@@ -147,19 +147,29 @@
             SHUTDOWN : 'SHUTDOWN'
         }
 
-        function byTag(tag) {
-            var _tag = tag;
-            return function (e) {
-                return e.target.tagName === tag.toUpperCase();
+        var Utilities = {
+            ByTag: function ByTag(tag) {
+                var _tag = tag;
+                return function (e) {
+                    return e.target.tagName === tag.toUpperCase();
+                }
+            },
+            ByDataType: function byDataType(type, not) {
+                var _type = type;
+                var invert = not === true;
+                return function (data) {
+                    if (invert) {
+                        return !data.type === _type;
+                    } else {
+                        return data.type === _type;
+                    }
+                }
             }
         }
 
-        function byDataType(type) {
-            var _type = type;
-            return function (data) {
-                return data.type === _type;
-            }
-        }
+        
+
+        
 
         var Playlist = function (element) {
             var _this = this;
@@ -222,18 +232,17 @@
                 }
             }
             this.GetElement = function (track) {
-                return $('<li />', { 'data-id': track.id, 'class': 'sortable list-group-item' })
-                            .text(track.title);
+                return $('<li />', { 'data-id': track.id, 'class': 'sortable list-group-item' }).text(track.title);
             }
             this.Draw = function (element, result) {
                 var max = result.length;
                 element.empty();
                 for (var i = 0; i < max; i += 1) {
                     element.append(trackItemView.Render(result[i]));
-                    //element.append(this.GetElement(result[i]));
                 }
             }
         };
+
         var playlist = new Playlist($('#playlist'));
         var tracks = new Tracks();
 
@@ -246,11 +255,11 @@
 				.throttle(300);
 
 
-        var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(byTag('button')).map(function (e) { return e.target.dataset; });
+        var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });
 
-        var transport$ = allClickEvents$.filter(function (data) { return data.type !== CTRLS.REMOVE; });// Rx.Observable.fromEvent($('.transport-control'), 'click');
+        var transport$ = allClickEvents$.filter(Utilities.ByDataType(CTRLS.REMOVE, true));
 
-        var removeItemClick$ = allClickEvents$.filter(byDataType(CTRLS.REMOVE));
+        var removeItemClick$ = allClickEvents$.filter(Utilities.ByDataType(CTRLS.REMOVE));
         removeItemClick$.subscribe(function (data) {
             playlist.Remove(data.id);
             playlist.Draw(tracks.Items);
