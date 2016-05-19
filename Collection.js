@@ -28,14 +28,22 @@ module.exports = function Collection() {
     this.CurrentId = null;
     this.CurrentIndex = -1;
     this.Query = function (search) {
-       
+        console.log(search);
         if (dataSets.Tracks) {
+            console.log(typeof search);
             if (typeof search === "string") {
                 //return [dataSets.Albums.query().filter({ 'name__icontains': search }).values(),
                 //        dataSets.Artists.query().filter({ 'name__icontains': search }).values(),
                 //        dataSets.Tracks.query().filter({ 'title__icontains': search }).values()]
-                return dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
+
+                var artists = dataSets.Tracks.query().filter({ 'artist__in' : search }).values();
+                var tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
+                var albums = dataSets.Tracks.query().filter({ 'album__icontains': search}).values();
+
+
+                return [].concat(artists, albums, tracks);
             } else {
+         
                 var searchObj = {};
                 searchObj[search[0] + '__icontains'] = search[1];
                 //return [[],

@@ -103,7 +103,7 @@
     <script id="track" type="text/template">
         <li class="list-group-item" data-id="{{id}}">
             <div class="track-label">{{title}} by {{ artist }}<br />
-                Year {{year}} Track {{track.no}} of {{track.of}}</div>
+               <em>{{album}} (Year {{year}} Track {{track.no}} of {{track.of}})</em></div>
             <span class="btn-wrapper">
                 <button data-type="REMOVE"
                     data-id="{{id}}"
@@ -252,7 +252,7 @@
         var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
 				.map(function (e) { return e.target.value; })
 				.filter(function (e) { return e.length > 2; })
-				.throttle(300);
+				.debounce(300);
 
 
         var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });
@@ -266,7 +266,7 @@
             playlist.Sync();
         });
 
-        transport$.subscribe(function (data) { socket.emit('transport', data); });
+        transport$.subscribe(function (data) {  socket.emit('transport', data); });
 
         var sortables = [];
         $('ul.tracks').each(function (index, item) {
@@ -308,7 +308,8 @@
         });
 
         searchRequest$.subscribe(function (value) {
-            socket.emit('search:query', ['title', value]);
+            console.log(value);
+            socket.emit('search:query', value);// ['title', value]);
         });
 
         socket.on('transport:now-playing', function (track) {
