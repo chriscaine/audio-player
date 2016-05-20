@@ -10,6 +10,10 @@ module.exports = function Collection() {
         Artists: null,
         Albums: null
     };
+    const findTracks = function(ids) {
+
+    }
+
     var buildDataCollection = function () {
         var tracks = [];
         for (var key in _this.Tracks) {
@@ -28,27 +32,31 @@ module.exports = function Collection() {
     this.CurrentId = null;
     this.CurrentIndex = -1;
     this.Query = function (search) {
-        console.log(search);
         if (dataSets.Tracks) {
-            console.log(typeof search);
             if (typeof search === "string") {
-                //return [dataSets.Albums.query().filter({ 'name__icontains': search }).values(),
-                //        dataSets.Artists.query().filter({ 'name__icontains': search }).values(),
-                //        dataSets.Tracks.query().filter({ 'title__icontains': search }).values()]
-
-                var artists = dataSets.Tracks.query().filter({ 'artist__in' : search }).values();
+            
+                var artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
                 var tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
-                var albums = dataSets.Tracks.query().filter({ 'album__icontains': search}).values();
+                var albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
 
+                var out = [];
 
-                return [].concat(artists, albums, tracks);
+                try {
+                  out = out.concat(dataSets.Tracks.query().filter({ 'id__in' : artists.map(x => x.ids)[0] }).values());
+                } catch (e) {
+                    console.log('artists error: ', e);
+                }
+
+                
+                out = out.concat(tracks, albums);
+                
+                console.log(out);
+
+                return out;
             } else {
          
                 var searchObj = {};
                 searchObj[search[0] + '__icontains'] = search[1];
-                //return [[],
-                //        [],
-                //     dataSets.Tracks.query().filter(searchObj).values()]
                 return dataSets.Tracks.query().filter(searchObj).values();
             }
 
@@ -76,8 +84,8 @@ module.exports = function Collection() {
         return this.Tracks[id];
     }
     this.GetCurrent = function() {
-	return _this.Tracks[_this.CurrentId];
-	}
+        return _this.Tracks[_this.CurrentId];
+    }
     this.SyncPlaylist = function (playlist) {
         let max = playlist.length;
         while (this.Playlist.length) this.Playlist.pop();
