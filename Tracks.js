@@ -1,12 +1,12 @@
 ﻿"use strict";
-
+    const fs = require('fs');
+        const meta = require('musicmetadata');
+        const Guid = require('./Guid.js');
 
 module.exports = {
     Tracks: function () { },
     Track: function (key) {
-        const fs = require('fs');
-        const meta = require('musicmetadata');
-        const Guid = require('./Guid.js');
+    
 
         this.title;     //str
         this.artist;    // [str]
@@ -20,7 +20,19 @@ module.exports = {
         this.Key = key;
         var _this = this;
         this.Fill = function (err, metadata) {
-            if (err) { _this._failed = true; console.log(err); return; }
+            if (err) {
+                _this._failed = true; console.log(err);
+                _this._callback({
+                    title: '',
+                    artist: '',    // [str]
+                    albumartist: '',   // [str]
+                    album: '',     // str
+                    year: '',      // str 
+                    track: {},
+                    genre: '',
+                    disk: {},
+                });
+            }
             _this._callback(metadata);
         }
         this.Init = function (callback) {

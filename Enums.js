@@ -4,6 +4,7 @@
         PAUSE:'PAUSE',
         STOP: 'STOP',
         STOPAFTER: 'STOPAFTER',
-        SHUTDOWN: 'SHUTDOWN'
+        SHUTDOWN: 'SHUTDOWN',
+        SYNC : 'SYNC'
     }
 }

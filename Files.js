@@ -2,18 +2,20 @@
 var fs = require('fs');
 
 module.exports = {
-    GetFiles: function (rootDir, callback) {
+    GetFiles: function (rootDir, callback, forceNew) {
         console.log('GET FILES');
         var files = [];
-        try {
-            files = JSON.parse(fs.readFileSync('data/files.json'));
-            if (files.length > 0) {
-                callback(files);
-                return;
-            }
-        } catch (e) {
-           
-        }
+        
+            //try {
+            //    files = JSON.parse(fs.readFileSync('data/files.json'));
+            //    if (files.length > 0) {
+            //        callback(files);
+            //        return;
+            //    }
+            //} catch (e) {
+
+            //}
+        
         var Progress = function (callback) {
             var values = {};
             this.New = function (val) {

@@ -29,7 +29,7 @@ io.on('connection', function (socket) {
     });
     
     var searchQuery$ = Rx.Observable.fromEvent(socket, 'search:query');
-
+   
     searchQuery$.subscribe(function (search) {
         console.log(search);
         if (search.length > 1) {
@@ -43,6 +43,7 @@ io.on('connection', function (socket) {
     var stop$ = transportCtrl$.filter(e => e.type === CTRLS.STOP);//.map(e => e.data);
     var stopAfter$ = transportCtrl$.filter(e => e.type === CTRLS.STOPAFTER);//.map(e => e.data);
     var shutdown$ = transportCtrl$.filter(e => e.type === CTRLS.SHUTDOWN);
+    var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
     var playlistSync$ = Rx.Observable.fromEvent(socket, 'playlist:sync');
 
     play$.subscribe(app.Play);
@@ -51,6 +52,7 @@ io.on('connection', function (socket) {
     stopAfter$.subscribe(app.StopAfter);
     shutdown$.subscribe(e => console.log('Shutting Down'));
     playlistSync$.subscribe(app.PlaylistSync);
+    syncfiles$.subscribe(app.NetworkFilesSync);
     
     app.OnConnection();
 

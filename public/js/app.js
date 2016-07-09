@@ -25,7 +25,7 @@ var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
 var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });
 
 var transport$ = allClickEvents$.filter(Utilities.IsTransportCtrl);
-transport$.subscribe(function (data) { socket.emit('transport', data); });
+transport$.subscribe(function (data) {  socket.emit('transport', data); });
 
 var removeItemClick$ = allClickEvents$.filter(Utilities.ByDataType(CTRLS.REMOVE));
 removeItemClick$.subscribe(function (data) {
@@ -75,7 +75,7 @@ $('ul.playlist').each(function (index, item) {
 });
 
 searchRequest$.subscribe(function (value) {
-   // console.log(value);
+    console.log(value);
     socket.emit('search:query', value);// ['title', value]);
 });
 
@@ -87,15 +87,19 @@ socket.on('transport:now-playing', function (track) {
 });
 
 socket.on('playlist:load', function (data) {
+    console.log('pl:load', data);
     tracks.Fill(data.Tracks);
     playlist.Fill(data.Playlist);
     playlist.Draw(tracks.Items);
 });
 
 socket.on('search:result', function (data) {
+    console.log('Result: ', data);
     tracks.Draw($('#tracks'), data.result);
     tracks.FillFromArray(data.result);
 });
 
-
+socket.on('sync:message', function (message) {
+    $('#message').text(message);
+});
 

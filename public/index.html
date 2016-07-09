@@ -8,8 +8,12 @@
         * {
             user-select: none;
         }
+        body{
+            display:flex;
+            flex-direction:column;
+        }
         .header {
-            height:12vh;
+            height:auto;
         }
         .well.well {
             min-height:unset;
@@ -17,7 +21,7 @@
             margin:0 20px 0 20px;
         }
         ul {
-            height: 85vh;
+            height: 80vh;
             overflow:auto;
             background-color: #e7e7e7;
             border: solid 1px #e5e5e5;
@@ -79,6 +83,7 @@
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOP"></button>
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" title="Stop playlist at end of track" data-type="STOPAFTER"></button>
             <span class="btn btn-default" id="now-playing"></span>
+            <button class="btn btn-primary" type="button" data-type="SYNC">Download Tracks</button>
             <button class="btn btn-danger glyphicon glyphicon-off pull-right" title="Shutdown System" type="button" data-type="SHUTDOWN"></button> 
              <button class="btn btn-alert glyphicon glyphicon-trash pull-right" title="Empty Playlist" type="button" data-type="REMOVE"></button>
         </div>
@@ -107,6 +112,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="well well-sm">
+        <p id="message">MESSAGE BAR</p>
     </div>
 <script id="track" type="text/template">
         <li class="list-group-item" data-id="{{id}}">

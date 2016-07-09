@@ -3,6 +3,7 @@ module.exports = function Collection() {
     const fs = require('fs');
     const _this = this;
     const List = require('./Tracks.js')['List'];
+    const Guid = require('./Guid.js');
     const DataCollection = require('data-collection');
     const playlistFile = 'data/current.json';
     const dataSets = {
@@ -10,7 +11,7 @@ module.exports = function Collection() {
         Artists: null,
         Albums: null
     };
-    const findTracks = function(ids) {
+    const findTracks = function (ids) {
 
     }
 
@@ -23,7 +24,7 @@ module.exports = function Collection() {
         dataSets.Albums = new DataCollection(_this.Albums.ToArrayWithKeys());
         dataSets.Artists = new DataCollection(_this.Artists.ToArrayWithKeys());
     }
-
+    this.Updating = false;
     this.Tracks = {};
     this.Albums = new List();
     this.Artists = new List();
@@ -34,27 +35,32 @@ module.exports = function Collection() {
     this.Query = function (search) {
         if (dataSets.Tracks) {
             if (typeof search === "string") {
-            
-                var artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
-                var tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
-                var albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
-
                 var out = [];
-
                 try {
-                  out = out.concat(dataSets.Tracks.query().filter({ 'id__in' : artists.map(x => x.ids)[0] }).values());
+
+                    var artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
+                    var tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
+                    var albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
+
+
+
+                    try {
+                        out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());
+                    } catch (e) {
+                        console.log('artists error: ', e);
+                    }
+
+
+                    out = out.concat(tracks, albums);
+
+                    console.log(out);
+
                 } catch (e) {
-                    console.log('artists error: ', e);
+                    console.log(e);
                 }
-
-                
-                out = out.concat(tracks, albums);
-                
-                console.log(out);
-
                 return out;
             } else {
-         
+
                 var searchObj = {};
                 searchObj[search[0] + '__icontains'] = search[1];
                 return dataSets.Tracks.query().filter(searchObj).values();
@@ -83,7 +89,10 @@ module.exports = function Collection() {
         }
         return this.Tracks[id];
     }
-    this.GetCurrent = function() {
+    this.TrackExists = function (file) {
+        return dataSets.Tracks.query().filter({ 'file': file }).values().length > 0;
+    }
+    this.GetCurrent = function () {
         return _this.Tracks[_this.CurrentId];
     }
     this.SyncPlaylist = function (playlist) {
@@ -147,6 +156,27 @@ module.exports = function Collection() {
             console.log(e);
         }
     };
+
+    this.Update = function (metadata, file) {
+        let guid = Guid();
+        _this.Tracks[guid] = {
+            id: guid,
+            title: metadata.title,
+            artist: metadata.artist,    // [str]
+            albumartist: metadata.albumartist,   // [str]
+            album: metadata.album,     // str
+            year: metadata.year,      // str 
+            track: metadata.track,
+            genre: metadata.genre,
+            disk: metadata.disk,
+            file: file
+        }
+        _this.Artists.Add(metadata.artist, guid);
+        _this.Artists.Add(metadata.albumartist, guid);
+        _this.Albums.Add(metadata.album, guid);
+        _this.Save();
+    }
+
     this.SavePlaylist = function () {
         try {
             fs.writeFileSync(playlistFile, JSON.stringify({ List: _this.Playlist, Id: _this.CurrentId, Index: 0 }));
