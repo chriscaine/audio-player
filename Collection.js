@@ -24,7 +24,7 @@ module.exports = function Collection() {
         dataSets.Albums = new DataCollection(_this.Albums.ToArrayWithKeys());
         dataSets.Artists = new DataCollection(_this.Artists.ToArrayWithKeys());
     }
-    this.Updating = false;
+
     this.Tracks = {};
     this.Albums = new List();
     this.Artists = new List();
@@ -36,28 +36,38 @@ module.exports = function Collection() {
         if (dataSets.Tracks) {
             if (typeof search === "string") {
                 var out = [];
+                var artists = [];
+                var tracks = [];
+                var albums = [];
                 try {
 
-                    var artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
-                    var tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
-                    var albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
-
-
-
-                    try {
-                        out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());
-                    } catch (e) {
-                        console.log('artists error: ', e);
-                    }
-
-
-                    out = out.concat(tracks, albums);
-
-                    console.log(out);
-
+                    artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
                 } catch (e) {
                     console.log(e);
                 }
+                try {
+                    tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
+                } catch (e) {
+                    console.log(e);
+                }
+                try {
+                    albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
+                } catch (e) {
+                    console.log(e);
+                }
+
+                try {
+                    out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());
+                } catch (e) {
+                    console.log('artists error: ', e);
+                }
+
+
+                out = out.concat(tracks, albums);
+
+                console.log(out);
+
+
                 return out;
             } else {
 
@@ -148,6 +158,9 @@ module.exports = function Collection() {
         }
 
     };
+
+    this.UpdateIndex = buildDataCollection;
+
     this.Save = function () {
         try {
             fs.writeFileSync('data/collection.json', JSON.stringify(_this));

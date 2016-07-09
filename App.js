@@ -98,6 +98,7 @@ module.exports = function App(io, player, collection) {
             console.log('Get Track Data');
             Files.GetTrackData(_collection.Tracks, _collection.Update, function () {
                 _collection.Save();
+                _collection.UpdateIndex();
                 _state.Updating = false;
             })(newFiles);
         }
