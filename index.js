@@ -1,15 +1,25 @@
 ﻿"use strict";
+
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('config.json'));
+
 const Rx = require('rxjs/Rx');
 const Express = require('express');
 const express = Express();
 const http = require('http').Server(express);
 const io = require('socket.io')(http);
-//const Player = require('./Player.js');
+
+var Player = null;
+if (config.live) {
+    Player = require('./Player.js');
+}
+
 const App = require('./App.js');
 const Collection = require('./Collection.js');
 const CTRLS = require('./Enums.js').CTRLS;
 const collection = new Collection();
-const player = null;// new Player();
+
+const player = Player !== null ? new Player() : null;
 const app = new App(io, player, collection);
 
 express.use(Express.static('public'));
