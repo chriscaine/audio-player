@@ -43,29 +43,29 @@ module.exports = function Collection() {
 
                     artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
                 } catch (e) {
-                    console.log(e);
+                  //  console.log(e);
                 }
                 try {
                     tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
                 } catch (e) {
-                    console.log(e);
+                   // console.log(e);
                 }
                 try {
                     albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
                 } catch (e) {
-                    console.log(e);
+                   // console.log(e);
                 }
 
                 try {
                     out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());
                 } catch (e) {
-                    console.log('artists error: ', e);
+                   // console.log('artists error: ', e);
                 }
 
 
                 out = out.concat(tracks, albums);
 
-                console.log(out);
+              //  console.log(out);
 
 
                 return out;

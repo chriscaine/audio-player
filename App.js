@@ -30,8 +30,8 @@ module.exports = function App(io, player, collection) {
         }
         let track = _collection.GetTrack(id);
         _io.emit('transport:now-playing', track);
-        console.log('PLAYING: ', track.title);
-        if (_player) _player.on('end', function () { console.log('track ends'); _this.Play(); });
+       
+        if (_player) _player.on('end', function () {  _this.Play(); });
         if (_player && track) _player.Play(track.file);
 
     }
@@ -95,7 +95,7 @@ module.exports = function App(io, player, collection) {
                     newFiles.push(item.LocalFile);
                 }
             });
-            console.log('Get Track Data');
+    
             Files.GetTrackData(_collection.Tracks, _collection.Update, function () {
                 _collection.Save();
                 _collection.UpdateIndex();

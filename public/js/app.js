@@ -8,7 +8,7 @@
 
 var trackItemView = new View('track');
 
-var socket = io.connect('http://localhost:8080/');
+var socket = io.connect('http://192.168.1.11:8080/');
 
 var playlist = new Playlist($('#playlist'), trackItemView);
 var tracks = new Tracks(trackItemView);
@@ -19,7 +19,7 @@ syncRequest$.throttle(2000).subscribe(playlist.Sync);
 var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
         .map(function (e) { return e.target.value; })
         .filter(function (e) { return e.length > 2; })
-        .debounce(300);
+        .debounce(800);
 
 
 var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });

@@ -41,7 +41,6 @@ io.on('connection', function (socket) {
     var searchQuery$ = Rx.Observable.fromEvent(socket, 'search:query');
    
     searchQuery$.subscribe(function (search) {
-        console.log(search);
         if (search.length > 1) {
             socket.emit('search:result', { result: collection.Query(search) });
         }
