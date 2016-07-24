@@ -35,14 +35,14 @@ removeItemClick$.subscribe(function (data) {
 });
 
 
-
 var sortables = [];
 $('ul.tracks').each(function (index, item) {
     var sortable = new Sortable(item, {
         group: {
             name: 'sortable',
             pull: 'clone',
-            put: false
+            put: false,
+	    handle : '.drag'
         }
     });
     sortables.push(sortable);
@@ -51,7 +51,7 @@ $('ul.tracks').each(function (index, item) {
 $('ul.playlist').each(function (index, item) {
     var sortable = new Sortable(item, {
         group: 'sortable',
-        //handle: '.drag-handle',
+        handle: '.drag',
         onAdd: function (evt) {
             var _playlist = [];
             $('ul.playlist li').each(function (index, item) {

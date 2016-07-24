@@ -71,6 +71,10 @@
         .now-playing .play {
             display: none;
         }
+	.drag {
+		width:30px;
+			
+	}
     </style>
 </head>
 <body class="" style="">
@@ -118,7 +122,8 @@
     </div>
 <script id="track" type="text/template">
         <li class="list-group-item" data-id="{{id}}">
-            <div class="track-label">{{title}} 
+           <div class="drag"><div class="glyphicon glyphicon-move glyphicon-2x"></div></div>
+	    <div class="track-label">{{title}} 
                 <div class="extras">
                 <span style="font-size:1.2rem;"> by {{ artist }}</span><br />
                <span style="font-size:1.2rem;"><em>{{album}} (Year {{year}} Track {{track.no}} of {{track.of}})</em></span></div>
