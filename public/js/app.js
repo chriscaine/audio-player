@@ -81,7 +81,7 @@ searchRequest$.subscribe(function (value) {
 
 socket.on('transport:now-playing', function (track) {
     if (track) {
-        $('#now-playing').text(track.title + ' by ' + track.artist[0]);
+        $('#now-playing-track').text(track.title + ' by ' + track.artist[0]);
         playlist.NowPlaying(track.id);
     }
 });
@@ -102,4 +102,8 @@ socket.on('search:result', function (data) {
 socket.on('sync:message', function (message) {
     $('#message').text(message);
 });
-
+var timeEl = $('#time');
+socket.on('progress', function(data) {
+	timeEl.text(data.timemark.substring(3,8));
+	console.log(data);
+});

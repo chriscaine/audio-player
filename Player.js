@@ -1,11 +1,13 @@
 ﻿"use strict";
 var fs = require('fs');
 var ffmpeg = require('fluent-ffmpeg');
-
+var cp = require('child_process');
 var Speaker = require('speaker');
 var util  = require('util');
 var stream = require('stream');
 var wav = require('wav');
+
+
 
 // pcm_s16le
 
@@ -14,7 +16,7 @@ const Player = function() {
 	var passThru$ = new stream.PassThrough();
 	var reader;
 	var speaker;
-
+	var Play = cp.fork('./Play.js');
 	this.events = {};
 	this.on = function(name, fn) {
 		var _this = this;
@@ -48,25 +50,28 @@ const Player = function() {
 		if(_this.events['end']) { _this.events['end']();}
 	}
 
-	var error = function(err){if(_this.events['error']) { _this.events['error']();}}
-	var progress = function(progress){if(_this.events['progress']) { _this.events['progress']();}}
-	var decoded = function() {if(_this.events['decoded']) { _this.events['decoded']();}}
+	var error = function(err){}
+	var progress = function(progress){}
+	var decoded = function() {}
 	
 	this.Play = function(file) {
-		if(passThru$) passThru$.unpipe();
-		reader = null;
-		passThru$ = null;
-		speaker = null;
-		var _this = this;
-		passThru$ = new stream.PassThrough();
-		//passThru$.on('data', function(chunk) { console.log(chunk);});
-		ffmpeg(file).audioCodec('pcm_s16le').audioChannels(2).audioFrequency(44100).format('wav')
-			.on('error', error)
-			.on('progress', progress)
-			.on('end', decoded).pipe(passThru$);
-		reader = new wav.Reader();
-		passThru$.pipe(reader);
-		reader.on('format', format).on('end', destroy);
+		console.log(file);
+		try{
+			Play.send(file);
+			Play.on('message', function(obj){
+			    if(obj.Type === 'end') {		
+					if(_this.events['end']) { _this.events['end']();}
+				} else if(obj.Type === 'progress') {
+					if(_this.events['end']) { _this.events['progress'](obj.Data);}
+				}
+			});
+		} catch(err) { console.log('ERROR', err);}
+
+	//	var ls = run('node Play.js', [JSON.stringify(file)], { stdio : ['pipe', 'pipe', 'pipe']});
+//
+//		ls.stdout.on('data', (d) => console.log(d));
+//		ls.stderr.on('data', (d) => console.log(d));
+//		ls.on('close', (d) => console.log(d));
 	} 
 	return this;
 }

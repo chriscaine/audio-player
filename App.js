@@ -32,6 +32,7 @@ module.exports = function App(io, player, collection) {
         _io.emit('transport:now-playing', track);
        
         if (_player) _player.on('end', function () {  _this.Play(); });
+	if (_player) _player.on('progress', function(data) { _io.emit('progress', data);});
         if (_player && track) _player.Play(track.file);
 
     }
