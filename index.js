@@ -8,6 +8,7 @@ const Express = require('express');
 const express = Express();
 const http = require('http').Server(express);
 const io = require('socket.io')(http);
+const serveStatic = require('serve-static');
 
 var Player = null;
 if (config.live) {
@@ -23,6 +24,9 @@ const player = Player !== null ? new Player() : null;
 const app = new App(io, player, collection);
 
 express.use(Express.static('public'));
+
+express.use('/audio', serveStatic(config.dir));
+
 http.listen(8080);
 
 collection.Load();
@@ -41,6 +45,7 @@ io.on('connection', function (socket) {
     var searchQuery$ = Rx.Observable.fromEvent(socket, 'search:query');
    
     searchQuery$.subscribe(function (search) {
+        console.log(search);
         if (search.length > 1) {
             socket.emit('search:result', { result: collection.Query(search) });
         }

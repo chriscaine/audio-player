@@ -2,7 +2,7 @@
 var fs = require('fs');
 var ffmpeg = require('fluent-ffmpeg');
 var cp = require('child_process');
-var Speaker = require('speaker');
+//var Speaker = require('speaker');
 var util  = require('util');
 var stream = require('stream');
 var wav = require('wav');
@@ -15,7 +15,7 @@ const Player = function() {
 	var _this = this;
 	var passThru$ = new stream.PassThrough();
 	var reader;
-	var speaker;
+	//var speaker;
 	var Play = cp.fork('./Play.js');
 	this.events = {};
 	this.on = function(name, fn) {
@@ -37,8 +37,8 @@ const Player = function() {
 	}
 
 	var format = function(format) {
-		speaker = new Speaker(format);
-		reader.pipe(speaker);
+	//	speaker = new Speaker(format);
+	//	reader.pipe(speaker);
 		if(_this.events['format']) { _this.events['format'](format);}
 	}
 
@@ -46,7 +46,7 @@ const Player = function() {
 	 	if(passThru$) passThru$.unpipe();
 		reader = null;
 		passThru$ = null;
-		speaker = null;
+	//	speaker = null;
 		if(_this.events['end']) { _this.events['end']();}
 	}
 
@@ -61,7 +61,8 @@ const Player = function() {
 			Play.on('message', function(obj){
 			    if(obj.Type === 'end') {		
 					if(_this.events['end']) { _this.events['end']();}
-				} else if(obj.Type === 'progress') {
+			    } else if(obj.Type === 'progress') {
+			        console.log(obj.Data.size);
 					if(_this.events['end']) { _this.events['progress'](obj.Data);}
 				}
 			});

@@ -87,9 +87,10 @@
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" data-type="STOP"></button>
             <button class="transport-control btn btn-warning glyphicon glyphicon-stop" type="button" title="Stop playlist at end of track" data-type="STOPAFTER"></button>
             <span class="btn btn-default" id="now-playing"><span id="now-playing-track"></span>&nbsp;<span id="time"></span></span>
-            <button class="btn btn-primary" type="button" data-type="SYNC">Download Tracks</button>
+          <!--  <button class="btn btn-primary" type="button" data-type="SYNC">Download Tracks</button>
             <button class="btn btn-danger glyphicon glyphicon-off pull-right" title="Shutdown System" type="button" data-type="SHUTDOWN"></button> 
-             <button class="btn btn-alert glyphicon glyphicon-trash pull-right" title="Empty Playlist" type="button" data-type="REMOVE"></button>
+             <button class="btn btn-alert glyphicon glyphicon-trash pull-right" title="Empty Playlist" type="button" data-type="REMOVE"></button> -->
+            <audio id="audio-player" controls="controls" autoplay="autoplay"></audio>
         </div>
             <div class="input-group">
                 <input id="txtSearch" class="form-control" type="text" ng-model="search" placeholder="Search for tracks..." />
@@ -148,7 +149,7 @@
     <script src="js/lib/jquery-1.7.1.min.js"></script>
     <script src="js/lib/rx.all.min.js"></script>
     <script src="js/lib/Sortable.js"></script>
-    <script src="http://192.168.1.11:8080/socket.io/socket.io.js"></script>
+    <script src="socket.io/socket.io.js"></script>
     <script src="js/Ctrls.js"></script>
     <script src="js/Playlist.js"></script>
     <script src="js/Tracks.js"></script>

@@ -8,7 +8,7 @@
 
 var trackItemView = new View('track');
 
-var socket = io.connect('http://192.168.1.11:8080/');
+var socket = io.connect(location.origin);
 
 var playlist = new Playlist($('#playlist'), trackItemView);
 var tracks = new Tracks(trackItemView);
@@ -83,6 +83,7 @@ socket.on('transport:now-playing', function (track) {
     if (track) {
         $('#now-playing-track').text(track.title + ' by ' + track.artist[0]);
         playlist.NowPlaying(track.id);
+        play(track);
     }
 });
 

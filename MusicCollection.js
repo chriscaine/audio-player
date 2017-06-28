@@ -70,5 +70,5 @@ function UpdateFiles() {
   
     Files.GetFiles(serverDir, CreateFileTable, false);
 }
-UpdateFiles();
-//CreateFiles();
+//UpdateFiles();
+CreateFiles();
