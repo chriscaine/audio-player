@@ -4,6 +4,7 @@
     this.El = element;
     this.Items = [];
     var that = this;
+    var _audio = null;
     this.Continue = true;
     this.Fill = function (playlist) {
         while (this.Items.length > 0) this.Items.pop();
@@ -50,9 +51,12 @@
         that.Continue = true;
 
         if (track !== undefined) {
-            _audio = new Audio('/audio' + track.file);
+            if(_audio === null) {
+                _audio = new Audio('/audio' + track.file);
+                _audio.addEventListener('ended', e => that.Next(id));
+            }
+
             _audio.play();
-            _audio.addEventListener('ended', e => that.Next(id));
         }
     }
     this.Next = function (id) {
@@ -60,10 +64,12 @@
             var index = this.Items.indexOf(id);
             var nextItem = this.Items[index + 1];
             that.Play(nextItem);
+        } else {
+            _audio = null;
         }
     }
     this.Pause = function () {
-        if (_audio) _audio.Pause();
+        if (_audio) _audio.pause();
     }
     this.StopAfter = function () {
         that.Continue = false;
