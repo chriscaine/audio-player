@@ -1,6 +1,8 @@
 ﻿var Tracks = function (view) {
     var _view = view;
+    var _audio;
     this.Items = {};
+    
     this.Fill = function (data) {
         for (var key in data) {
             this.Items[key] = data[key];
@@ -22,4 +24,5 @@
             element.append(_view.Render(result[i]));
         }
     }
+   
 };

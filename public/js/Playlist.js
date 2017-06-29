@@ -3,6 +3,8 @@
     var _this = this;
     this.El = element;
     this.Items = [];
+    var that = this;
+    this.Continue = true;
     this.Fill = function (playlist) {
         while (this.Items.length > 0) this.Items.pop();
         var max = playlist.length;
@@ -42,5 +44,28 @@
     this.Update = function () {
         // update playlist from view
         throw "Not Implimented";
+    }
+    this.Play = function (id) {
+        var track = tracks.Items[id];
+        that.Continue = true;
+
+        if (track !== undefined) {
+            _audio = new Audio('/audio' + track.file);
+            _audio.play();
+            _audio.addEventListener('ended', e => that.Next(id));
+        }
+    }
+    this.Next = function (id) {
+        if (that.Continue) {
+            var index = this.Items.indexOf(id);
+            var nextItem = this.Items[index + 1];
+            that.Play(nextItem);
+        }
+    }
+    this.Pause = function () {
+        if (_audio) _audio.Pause();
+    }
+    this.StopAfter = function () {
+        that.Continue = false;
     }
 }

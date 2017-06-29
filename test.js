@@ -16,7 +16,4 @@
 const fs = require('fs');
 
 
-fs.writeFileSync('config.json', JSON.stringify({
-    live:false,
-    dir:'G:\\Music'
-}));
+//fs.writeFileSync('data/current.json', JSON.stringify({ List: [], Id: null, Index: 0 }));

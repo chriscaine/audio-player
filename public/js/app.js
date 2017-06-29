@@ -24,8 +24,24 @@ var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
 
 var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });
 
-var transport$ = allClickEvents$.filter(Utilities.IsTransportCtrl);
-transport$.subscribe(function (data) {  socket.emit('transport', data); });
+var transportCtrl$ = allClickEvents$.filter(Utilities.IsTransportCtrl);
+//transport$.subscribe(function (data) { socket.emit('transport', data); });
+var play$ = transportCtrl$.filter(e => e.type === CTRLS.PLAY);//.map(e => e.data);
+var pause$ = transportCtrl$.filter(e => e.type === CTRLS.PAUSE);//.map(e => e.data);
+var stop$ = transportCtrl$.filter(e => e.type === CTRLS.STOP);//.map(e => e.data);
+var stopAfter$ = transportCtrl$.filter(e => e.type === CTRLS.STOPAFTER);//.map(e => e.data);
+var shutdown$ = transportCtrl$.filter(e => e.type === CTRLS.SHUTDOWN);
+var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
+
+play$.subscribe(function (e) {
+    playlist.Play(e.id);
+});
+pause$.subscribe(function (e) {
+    playlist.Pause(e.id);
+});
+stopAfter$.subscribe(function (e) {
+    playlist.StopAfter(e.id);
+});
 
 var removeItemClick$ = allClickEvents$.filter(Utilities.ByDataType(CTRLS.REMOVE));
 removeItemClick$.subscribe(function (data) {
