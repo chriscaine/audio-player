@@ -9,10 +9,11 @@
 var trackItemView = new View('track');
 
 var socket = io.connect(location.origin);
-
-var playlist = new Playlist($('#playlist'), trackItemView);
 var tracks = new Tracks(trackItemView);
+var tracks$ = new Rx.Subject();
 
+var playlist = new Playlist($('#playlist'), trackItemView, tracks$);
+tracks$.onNext(tracks);
 var syncRequest$ = new Rx.Subject();
 syncRequest$.throttle(2000).subscribe(playlist.Sync);
 
@@ -34,6 +35,7 @@ var shutdown$ = transportCtrl$.filter(e => e.type === CTRLS.SHUTDOWN);
 var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
 
 play$.subscribe(function (e) {
+    console.log(e);
     playlist.Play(e.id);
 });
 pause$.subscribe(function (e) {

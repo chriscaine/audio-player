@@ -1,10 +1,13 @@
-﻿var Playlist = function (element, view) {
+﻿var Playlist = function (element, view, tracks$) {
     var _view = view;
     var _this = this;
     this.El = element;
     this.Items = [];
     var that = this;
-    var _audio = null;
+
+    var playlist$ = Rx.Observable.just(that);
+    
+    var _audio = new AudioEngine(playlist$, tracks$);
     this.Continue = true;
     this.Fill = function (playlist) {
         while (this.Items.length > 0) this.Items.pop();
@@ -47,17 +50,12 @@
         throw "Not Implimented";
     }
     this.Play = function (id) {
+        console.log(id);
         var track = tracks.Items[id];
         that.Continue = true;
 
-        if (track !== undefined) {
-            if(_audio === null) {
-                _audio = new Audio('/audio' + track.file);
-                _audio.addEventListener('ended', e => that.Next(id));
-            }
 
-            _audio.play();
-        }
+        _audio.Play(0);
     }
     this.Next = function (id) {
         if (that.Continue) {
@@ -69,7 +67,7 @@
         }
     }
     this.Pause = function () {
-        if (_audio) _audio.pause();
+        
     }
     this.StopAfter = function () {
         that.Continue = false;
