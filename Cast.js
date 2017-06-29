@@ -6,28 +6,31 @@ const chromecastjs = require('chromecast-js')
 const Cast = function(options) {
     var server = options.server;
 
-    var browser = new chromecastjs.Browser()
+    
 
     var startBrowser$ = new Rx.Subject();
 
     var browserReady$ = Rx.Observable.fromEvent(browser, 'deviceOn');
 
-    var deviceReady$ = browserReady$.flatMap(function(x) { x.connect(); return Obs.fromEvent('connected'); });
-
+    var deviceReady$ = browserReady$.flatMap(function(x) { console.log('connect'); x.connect(); return Obs.fromEvent('connected'); }).share();
+var browser = new chromecastjs.Browser();
     var play$ = new Rx.Subject();
     var pause$ = new Rx.Subject();
     var stop$ = new Rx.Subject();
 
     this.Play = function(e) {
-        play$.onNext(e);
+        play$.next(e);
     }
     this.Pause = function(e) {
-        pause$.onNext(e);
+        pause$.next(e);
     }
     this.Stop = function(e) {
-        stop$.onNext(e);
+        stop$.next(e);
     }
 
+    deviceReady$.subscribe(function(){
+        console.log('device ready');
+    });
 
     var playWhenReady$ = Obs.combineLatest(deviceReady$, play$);
     var pauseWhenReady$ = Obs.combineLatest(deviceReady$, pause$);
