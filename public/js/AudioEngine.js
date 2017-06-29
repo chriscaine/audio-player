@@ -46,11 +46,31 @@
 
 
     var scheduledTracks$ = scheduleTrack$.flatMap(load);
-    scheduledTracks$.subscribe(function (track) {
+    var playNextTrack$ = new Rx.Subject();
+    var zipped$ = Rx.Observable.zip(Rx.Observable.merge(playNextTrack$, playTrack$), scheduledTracks$).map(arr => arr[1]);
 
+    zipped$.subscribe(function (track) {
+        var fadeDur = 2;
+        var currTime = _audioCtx.currentTime;
+        console.log(track);
+        var duration = track.source.buffer.duration;
+        var startNewAt = currTime + duration - fadeDur;
+
+        track.gain.gain.linearRampToValueAtTime(0, currTime);
+        track.gain.gain.linearRampToValueAtTime(1, currTime + fadeDur);
+
+        track.gain.gain.linearRampToValueAtTime(1, startNewAt);
+        track.gain.gain.linearRampToValueAtTime(0, currTime + duration);
+        
         track.gain.connect(_audioCtx.destination);
 
         track.source.start(0);
+
+        getNextTrack$.onNext(track.index + 1);
+
+        setTimeout(function () {
+            playNextTrack$.onNext(true);
+        }, (duration - fadeDur) * 1000);
     }, function () { }, function () { });
     
 
