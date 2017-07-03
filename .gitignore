@@ -57,3 +57,4 @@ data/files.json
 data/files_backup.json
 .vs/config/applicationhost.config
 *.json
+npm-debug.log

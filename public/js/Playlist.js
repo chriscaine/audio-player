@@ -5,9 +5,10 @@
     this.Items = [];
     var that = this;
 
-    var playlist$ = Rx.Observable.just(that);
-    
-    var _audio = new AudioEngine(playlist$, tracks$);
+    const playlist$ = new Rx.Subject();
+    const _nowPlaying$ = new Rx.Subject();
+    var _audio = new AudioEngine(playlist$, tracks$, _nowPlaying$);
+    playlist$.onNext(that.Items);
     this.Continue = true;
     this.Fill = function (playlist) {
         while (this.Items.length > 0) this.Items.pop();
@@ -16,18 +17,22 @@
             this.Items.push(playlist[i]);
         }
     }
+
+
     this.NowPlaying = function (id) {
-        this.El.find('li').removeClass('now-playing').each(function (i, item) {
+        that.El.find('li').removeClass('now-playing').each(function (i, item) {
             if ($(item).attr('data-id') === id) $(item).addClass('now-playing');
         });
     }
+    _nowPlaying$.subscribe(that.NowPlaying, x => { }, x => { });
 
     this.Draw = function (tracks) {
         _this.El.empty();
-        var max = _this.Items.length;
-        for (var i = 0; i < max; i += 1) {
-            _this.El.append(_view.Render(tracks[_this.Items[i]]));
-        }
+        _this.Items.forEach(function (item, index) { 
+            var trk = tracks[item];
+            trk.index = index;
+            _this.El.append(_view.Render(trk));
+        });
     }
     this.Remove = function (id) {
         if (id) {
@@ -43,6 +48,7 @@
     }
     this.Sync = function () {
         //      console.log(this, _this);
+        playlist$.onNext(that.Items);
         socket.emit('playlist:sync', _this.Items);
     }
     this.Update = function () {
@@ -50,12 +56,7 @@
         throw "Not Implimented";
     }
     this.Play = function (id) {
-        console.log(id);
-        var track = tracks.Items[id];
-        that.Continue = true;
-
-
-        _audio.Play(0);
+        _audio.Play(_this.Items.indexOf(id));
     }
     this.Next = function (id) {
         if (that.Continue) {
@@ -67,9 +68,10 @@
         }
     }
     this.Pause = function () {
-        
+        _audio.Pause();
     }
     this.StopAfter = function () {
-        that.Continue = false;
+        _audio.StopAfter();
+//        that.Continue = false;
     }
 }

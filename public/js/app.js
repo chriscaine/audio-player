@@ -13,7 +13,7 @@ var tracks = new Tracks(trackItemView);
 var tracks$ = new Rx.Subject();
 
 var playlist = new Playlist($('#playlist'), trackItemView, tracks$);
-tracks$.onNext(tracks);
+tracks$.onNext(tracks.Items);
 var syncRequest$ = new Rx.Subject();
 syncRequest$.throttle(2000).subscribe(playlist.Sync);
 
@@ -36,10 +36,12 @@ var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
 
 play$.subscribe(function (e) {
     console.log(e);
+    playlist.Pause();
     playlist.Play(e.id);
 });
 pause$.subscribe(function (e) {
-    playlist.Pause(e.id);
+    console.log('pause');
+    playlist.Pause();
 });
 stopAfter$.subscribe(function (e) {
     playlist.StopAfter(e.id);
@@ -93,7 +95,7 @@ $('ul.playlist').each(function (index, item) {
 });
 
 searchRequest$.subscribe(function (value) {
-    console.log(value);
+  
     socket.emit('search:query', value);// ['title', value]);
 });
 
@@ -106,14 +108,13 @@ socket.on('transport:now-playing', function (track) {
 });
 
 socket.on('playlist:load', function (data) {
-    console.log('pl:load', data);
+    console.info('pl:load');
     tracks.Fill(data.Tracks);
     playlist.Fill(data.Playlist);
     playlist.Draw(tracks.Items);
 });
 
 socket.on('search:result', function (data) {
-    console.log('Result: ', data);
     tracks.Draw($('#tracks'), data.result);
     tracks.FillFromArray(data.result);
 });
