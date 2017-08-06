@@ -35,41 +35,36 @@ module.exports = function Collection() {
     this.Query = function (search) {
         if (dataSets.Tracks) {
             if (typeof search === "string") {
-                var out = [];
+                var artistsMapToTracks = [];
                 var artists = [];
                 var tracks = [];
                 var albums = [];
                 try {
-
                     artists = dataSets.Artists.query().filter({ 'name__icontains': search }).values();
                 } catch (e) {
-                  //  console.log(e);
+                    //  console.log(e);
                 }
                 try {
                     tracks = dataSets.Tracks.query().filter({ 'title__icontains': search }).values();
                 } catch (e) {
-                   // console.log(e);
+                    // console.log(e);
                 }
                 try {
                     albums = dataSets.Albums.query().filter({ 'name__icontains': search }).values();
                 } catch (e) {
-                   // console.log(e);
+                    // console.log(e);
                 }
-                console.log(albums);
-
                 try {
-                    out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());
+                    artistsMapToTracks = dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values();
                 } catch (e) {
-                   // console.log('artists error: ', e);
+                    // console.log('artists error: ', e);
                 }
-
-
-                out = out.concat(tracks, albums);
-
-              //  console.log(out);
-
-
-                return out;
+                
+                return {
+                    Tracks: tracks.concat(artistsMapToTracks),
+                    Albums: albums,
+                    Artists : artists
+                };
             } else {
 
                 var searchObj = {};

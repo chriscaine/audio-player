@@ -75,18 +75,24 @@ $('ul.playlist').each(function (index, item) {
         onAdd: function (evt) {
             var _playlist = [];
             $('ul.playlist li').each(function (index, item) {
-                _playlist.push(item.dataset.id);
+                var ids = item.dataset.id.split(',');
+                ids.forEach(function (id, i) {
+                    _playlist.push(id);
+                });
             });
-
+            
             playlist.Fill(_playlist);
-            syncRequest$.onNext(true);
+            playlist.Sync();
         },
         onUpdate: function () {
             var _playlist = [];
             $('ul.playlist li').each(function (index, item) {
-                _playlist.push(item.dataset.id);
+                var ids = item.dataset.id.split(',');
+                ids.forEach(function (id, i) {
+                    _playlist.push(id);
+                });
             });
-
+            playlist.Draw(tracks);
             playlist.Fill(_playlist);
             syncRequest$.onNext(true);
         }
