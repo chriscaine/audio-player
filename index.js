@@ -10,28 +10,44 @@ const http = require('http').Server(express);
 const io = require('socket.io')(http);
 const serveStatic = require('serve-static');
 
-var Player = null;
-if (config.live) {
-    Player = require('./Player.js');
-}
-
 const App = require('./App.js');
 const Collection = require('./Collection.js');
 const CTRLS = require('./Enums.js').CTRLS;
 const collection = new Collection();
+const cors = require('cors');
 
-const player = Player !== null ? new Player() : null;
+var player; 
+if (config.live) {
+    var Player = require('./Player.js');
+    player = new Player();
+} else {
+    var Cast = require('./Cast.js');
+    player = new Cast();
+}
+
 const app = new App(io, player, collection);
 
 express.use(Express.static('public'));
 
-express.use('/audio', serveStatic(config.dir));
+//express.use('/audio', serveStatic(config.dir));
+
+express.get('/audio/:id', cors(), function (req, res) {
+    console.log(req, res);
+    var trk = collection.Tracks[req.params.id];
+    if (trk) {
+        var fileParts = trk.file.split('.');
+        var ext = fileParts[fileParts.length - 1];
+        var file = config.dir + trk.file;
+        var filestream = fs.createReadStream(file);
+        res.setHeader('Content-disposition', 'inline; filename=' + trk.title);
+        res.setHeader('Content-type', 'audio/' + ext);
+        filestream.pipe(res);
+    }
+});
 
 http.listen(8080);
 
 collection.Load();
-
-
 
 
 io.on('connection', function (socket) {

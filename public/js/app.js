@@ -26,14 +26,14 @@ var searchRequest$ = Rx.Observable.fromEvent($('#txtSearch'), 'input')
 var allClickEvents$ = Rx.Observable.fromEvent(document.body, 'click').filter(Utilities.ByTag('button')).map(function (e) { return e.target.dataset; });
 
 var transportCtrl$ = allClickEvents$.filter(Utilities.IsTransportCtrl);
-//transport$.subscribe(function (data) { socket.emit('transport', data); });
+transportCtrl$.subscribe(function (data) { socket.emit('transport', data); });
 var play$ = transportCtrl$.filter(e => e.type === CTRLS.PLAY);//.map(e => e.data);
 var pause$ = transportCtrl$.filter(e => e.type === CTRLS.PAUSE);//.map(e => e.data);
 var stop$ = transportCtrl$.filter(e => e.type === CTRLS.STOP);//.map(e => e.data);
 var stopAfter$ = transportCtrl$.filter(e => e.type === CTRLS.STOPAFTER);//.map(e => e.data);
 var shutdown$ = transportCtrl$.filter(e => e.type === CTRLS.SHUTDOWN);
 var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
-
+/*
 play$.subscribe(function (e) {
     console.log(e);
     playlist.Pause();
@@ -46,7 +46,7 @@ pause$.subscribe(function (e) {
 stopAfter$.subscribe(function (e) {
     playlist.StopAfter(e.id);
 });
-
+*/
 var removeItemClick$ = allClickEvents$.filter(Utilities.ByDataType(CTRLS.REMOVE));
 removeItemClick$.subscribe(function (data) {
     playlist.Remove(data.id);
@@ -103,7 +103,7 @@ socket.on('transport:now-playing', function (track) {
     if (track) {
         $('#now-playing-track').text(track.title + ' by ' + track.artist[0]);
         playlist.NowPlaying(track.id);
-        play(track);
+      //  play(track);
     }
 });
 
@@ -124,6 +124,19 @@ socket.on('sync:message', function (message) {
 });
 var timeEl = $('#time');
 socket.on('progress', function(data) {
-	timeEl.text(data.timemark.substring(3,8));
-	console.log(data);
+    timeEl.text(data.timemark.substring(3, 8));
+  
+});
+function getTwoDigit(val) {
+    if (val < 10) return '0' + val;
+    return val;
+}
+socket.on('status', function (data) {
+    if (data.track !== undefined) {
+        var minutes = Math.ceil(data.timeRemaining / 60);
+        var seconds = getTwoDigit(Math.round(data.timeRemaining % 60));
+        timeEl.text(' : ' + (minutes ? minutes + '\'' : '') + seconds + '"');
+        playlist.NowPlaying(data.track.id);
+        $('#now-playing-track').text(data.track.title + ' by ' + data.track.artist[0]);
+    }
 });

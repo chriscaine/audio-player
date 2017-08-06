@@ -54,8 +54,10 @@ const Player = function() {
 	var progress = function(progress){}
 	var decoded = function() {}
 	
-	this.Play = function(file) {
-		console.log(file);
+	this.Play = function(track) {
+        let file = track.file;
+        console.log(file);
+
 		try{
 			Play.send(file);
 			Play.on('message', function(obj){

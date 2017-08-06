@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "chromecast-js": "^0.1.7",
+    "cors": "^2.8.4",
     "data-collection": "^1.1.6",
     "express": "^4.10.2",
     "fluent-ffmpeg": "^2.0.1",

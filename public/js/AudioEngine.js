@@ -38,7 +38,7 @@
         var track = tracks[id];
         var request = new XMLHttpRequest();
         if (track) {
-            request.open('GET', '/audio' + track.file, true);
+            request.open('GET', '/audio/' + track.id, true);
             request.responseType = 'arraybuffer';
             request.send();
 

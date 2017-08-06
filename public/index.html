@@ -5,12 +5,14 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" />
     <meta name="viewport" value="width=device-width;initial-scale=1" />
     <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Lato');
         * {
             user-select: none;
         }
         body{
             display:flex;
             flex-direction:column;
+            font-family: 'Lato', sans-serif;
         }
         .header {
             height:auto;
@@ -66,12 +68,15 @@
         .tracks .btn {
             display: none;
         }
-
-        .now-playing .playing {
+        #now-playing {
+            letter-spacing: 0.08em;
+            font-weight:400;
+        }
+        #now-playing .playing {
             display: block;
         }
 
-        .now-playing .play {
+        #now-playing .play {
             display: none;
         }
 	.drag {

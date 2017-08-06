@@ -55,6 +55,7 @@ module.exports = function Collection() {
                 } catch (e) {
                    // console.log(e);
                 }
+                console.log(albums);
 
                 try {
                     out = out.concat(dataSets.Tracks.query().filter({ 'id__in': artists.map(x => x.ids)[0] }).values());

@@ -19,6 +19,7 @@ module.exports = function App(io, player, collection) {
     const _collection = collection;
     const _state = {updating : false}
     this.Play = function (data) {
+        console.log(data);
         let id;
         if (data && data.id) {
             id = data.id;
@@ -33,9 +34,10 @@ module.exports = function App(io, player, collection) {
        
         if (_player) _player.on('end', function () {  _this.Play(); });
 	if (_player) _player.on('progress', function(data) { _io.emit('progress', data);});
-        if (_player && track) _player.Play(track.file);
-
+        if (_player && track) _player.Play(track);
     }
+
+    _player.on('status', x => _io.emit('status', x));
     this.Pause = function (data) {
         if (_player) _player.Pause();
         console.log('pause');
