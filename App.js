@@ -37,7 +37,7 @@ module.exports = function App(io, player, collection) {
         if (_player && track) _player.Play(track);
     }
 
-    _player.on('status', x => _io.emit('status', x));
+    if(_player) _player.on('status', x => _io.emit('status', x));
     this.Pause = function (data) {
         if (_player) _player.Pause();
         console.log('pause');

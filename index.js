@@ -16,13 +16,13 @@ const CTRLS = require('./Enums.js').CTRLS;
 const collection = new Collection();
 const cors = require('cors');
 
-var player; 
+var player = null; 
 if (config.live) {
     var Player = require('./Player.js');
     player = new Player();
 } else {
-    var Cast = require('./Cast.js');
-    player = new Cast();
+  //  var Cast = require('./Cast.js');
+  //  player = new Cast();
 }
 
 const app = new App(io, player, collection);
@@ -59,12 +59,19 @@ io.on('connection', function (socket) {
     });
     
     var searchQuery$ = Rx.Observable.fromEvent(socket, 'search:query');
-   
+
+    var requestTrack$ = Rx.Observable.fromEvent(socket, 'track:request');
+
     searchQuery$.subscribe(function (search) {
         console.log(search);
         if (search.length > 1) {
             socket.emit('search:result', { result: collection.Query(search) });
         }
+    });
+
+    requestTrack$.subscribe(function (id) {
+        console.log(id);
+        socket.emit('track:response',  collection.Tracks[id] );
     });
 
     var transportCtrl$ = Rx.Observable.fromEvent(socket, 'transport');

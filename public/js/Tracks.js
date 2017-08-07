@@ -1,7 +1,11 @@
-﻿var Tracks = function (view) {
+﻿var Tracks = function (view, trackList$) {
     var _view = view;
     var _audio;
     this.Items = {};
+    var _this = this;
+    trackList$.subscribe(function (trk) {
+        _this.Items[trk.id] = trk;
+    });
 
     this.Fill = function (data) {
         for (var key in data) {

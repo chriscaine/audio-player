@@ -1,4 +1,5 @@
-﻿var View = function (template) {
+﻿var socket = io.connect(location.origin);
+var View = function (template) {
     var template = $('#' + template).html();
     Mustache.parse(template);   // optional, speeds up future uses
     this.Render = function (model) {
@@ -8,9 +9,13 @@
 
 var trackItemView = new View('track');
 
-var socket = io.connect(location.origin);
-var tracks = new Tracks(trackItemView);
+var trackList$ = Rx.Observable.fromEvent(socket, 'track:response');
+
+
+var tracks = new Tracks(trackItemView, trackList$);
 var tracks$ = new Rx.Subject();
+
+
 
 var playlist = new Playlist($('#playlist'), trackItemView, tracks$);
 tracks$.onNext(tracks.Items);
@@ -33,6 +38,10 @@ var stop$ = transportCtrl$.filter(e => e.type === CTRLS.STOP);//.map(e => e.data
 var stopAfter$ = transportCtrl$.filter(e => e.type === CTRLS.STOPAFTER);//.map(e => e.data);
 var shutdown$ = transportCtrl$.filter(e => e.type === CTRLS.SHUTDOWN);
 var syncfiles$ = transportCtrl$.filter(e => e.type === CTRLS.SYNC);
+
+var requestTracks$ = new Rx.Subject();
+
+
 /*
 play$.subscribe(function (e) {
     console.log(e);
@@ -61,8 +70,8 @@ $('ul.tracks').each(function (index, item) {
         group: {
             name: 'sortable',
             pull: 'clone',
-            put: false,
-	    handle : '.drag'
+            put: true,
+	        handle : '.drag'
         }
     });
     sortables.push(sortable);
@@ -74,6 +83,28 @@ $('ul.playlist').each(function (index, item) {
         handle: '.drag',
         onAdd: function (evt) {
             var _playlist = [];
+            var ids = evt.item.dataset.id;
+            var arrIds = ids.split(',');
+            var index = -1;
+
+            if (arrIds.length > 1) {
+                $('ul.playlist li').each(function (i, item) {
+                    if (item.dataset.id === ids) {
+                        index = i;
+                    }
+                });
+
+                $(evt.item).remove();
+                
+                arrIds.forEach(function (item, i) {
+                    var trk = tracks.Items[item];
+                    console.log(trk);
+                    if (trk) {
+                        trk.class = 'track';
+                        $('ul.playlist li').eq(index + i -1).after(trackItemView.Render(trk));
+                    }
+                });
+            }
             $('ul.playlist li').each(function (index, item) {
                 var ids = item.dataset.id.split(',');
                 ids.forEach(function (id, i) {
@@ -92,7 +123,7 @@ $('ul.playlist').each(function (index, item) {
                     _playlist.push(id);
                 });
             });
-            playlist.Draw(tracks);
+       //     playlist.Draw(tracks);
             playlist.Fill(_playlist);
             syncRequest$.onNext(true);
         }
@@ -121,6 +152,13 @@ socket.on('playlist:load', function (data) {
 });
 
 socket.on('search:result', function (data) {
+    data.result.Albums.forEach(function (item, i) {
+        item.ids.forEach(function (id, i) {
+            requestTracks$.onNext(id);
+        });
+    });
+
+
     tracks.Draw($('#tracks'), data.result);
     tracks.FillFromArray(data.result);
 });
@@ -146,3 +184,13 @@ socket.on('status', function (data) {
         $('#now-playing-track').text(data.track.title + ' by ' + data.track.artist[0]);
     }
 });
+
+
+//trackList$ 
+
+requestTracks$.subscribe(function (id) {
+    socket.emit('track:request', id);    
+});
+
+
+
