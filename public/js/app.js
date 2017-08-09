@@ -177,7 +177,7 @@ function getTwoDigit(val) {
 }
 socket.on('status', function (data) {
     if (data.track !== undefined) {
-        var minutes = Math.ceil(data.timeRemaining / 60);
+        var minutes = Math.floor(data.timeRemaining / 60);
         var seconds = getTwoDigit(Math.round(data.timeRemaining % 60));
         timeEl.text(' : ' + (minutes ? minutes + '\'' : '') + seconds + '"');
         playlist.NowPlaying(data.track.id);

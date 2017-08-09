@@ -3,7 +3,8 @@ const Rx = require('rxjs/Rx');
 const Obs = Rx.Observable;
 const chromecastjs = require('chromecast-js')
 
-const Cast = function () {
+const Cast = function (config) {
+    const _config = config;
     var browser = new chromecastjs.Browser();
 
     var startBrowser$ = new Rx.Subject();
@@ -24,12 +25,10 @@ const Cast = function () {
         play$.next(e);
     }
     this.Pause = function (e) {
-        console.log('Pause : not implemented');
-     //   pause$.next(e);
+          pause$.next(e);
     }
     this.Stop = function (e) {
-        console.log('Stop : not implemented');
-        //    stop$.next(e);
+          stop$.next(e);
     }
 
     this.events = {};
@@ -83,14 +82,16 @@ const Cast = function () {
     });
 
     var playWhenReady$ = Obs.combineLatest(deviceReady$, play$);
-    var pauseWhenReady$ = Obs.combineLatest(deviceReady$, pause$);
-    var stopWhenReady$ = Obs.combineLatest(deviceReady$, stop$);
-
+    var pauseWhenReady$ = pause$.withLatestFrom(deviceReady$);
+    var stopWhenReady$ = stop$.withLatestFrom(deviceReady$);
+    var _device = null;
     playWhenReady$.subscribe(function (arr) {
         var device = arr[0];
+        _device = device;
         var track = arr[1];
         console.log(track);
-        var url = 'http://192.168.1.107:8080/audio/' + track.id;
+        var url = 'http://{0}:{1}/audio/{2}'.replace(/\{([0-9]{1,3})\}/g, (i, v) => [_config.ip, _config.port, track.id][parseInt(v)]);
+        console.log(url);
 
         var fileParts = track.file.split('.');
         var ext = fileParts[fileParts.length - 1];
@@ -118,17 +119,27 @@ const Cast = function () {
     });
 
     pauseWhenReady$.subscribe(function (arr) {
-        var device = arr[0];
-        device.pause(function () {
-            console.log('Paused!')
-        });
+        let device = _device;
+        if (device && device.player) {
+            if (device.player.media.currentSession.playerState === "PAUSED") {
+                device.unpause(function () {
+                    console.log('Un-Paused!')
+                });
+            } else {
+                device.pause(function () {
+                    console.log('Paused!')
+                });
+            }
+        }
     });
 
     stopWhenReady$.subscribe(function (arr) {
-        var device = arr[0];
-        device.stop(function () {
-            console.log('Stopped!')
-        });
+        let device = _device;
+        if (device && device.player) {
+            device.stop(function () {
+                console.log('Stopped!')
+            });
+        }
     });
 
 

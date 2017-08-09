@@ -21,8 +21,8 @@ if (config.live) {
     var Player = require('./Player.js');
     player = new Player();
 } else {
-  //  var Cast = require('./Cast.js');
-  //  player = new Cast();
+    var Cast = require('./Cast.js');
+    player = new Cast(config);
 }
 
 const app = new App(io, player, collection);
@@ -32,7 +32,6 @@ express.use(Express.static('public'));
 //express.use('/audio', serveStatic(config.dir));
 
 express.get('/audio/:id', cors(), function (req, res) {
-    console.log(req, res);
     var trk = collection.Tracks[req.params.id];
     if (trk) {
         var fileParts = trk.file.split('.');
