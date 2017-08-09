@@ -8,7 +8,7 @@ const Express = require('express');
 const express = Express();
 const http = require('http').Server(express);
 const io = require('socket.io')(http);
-const serveStatic = require('serve-static');
+//const serveStatic = require('serve-static');
 
 const App = require('./App.js');
 const Collection = require('./Collection.js');
