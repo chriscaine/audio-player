@@ -43,8 +43,8 @@ express.get('/audio/:id', cors(), function (req, res) {
         filestream.pipe(res);
     }
 });
-
-http.listen(parseInt(config.ip));
+console.log();
+http.listen(parseInt(config.port));
 
 collection.Load();
 

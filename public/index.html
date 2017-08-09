@@ -2,7 +2,7 @@
 <html ng-app="app">
 <head>
     <title>Socket.IO Position</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/bootstrap.css" rel="stylesheet" />
     <meta name="viewport" value="width=device-width;initial-scale=1" />
     <link href="css/app.css" rel="stylesheet" />
 </head>
@@ -19,7 +19,6 @@
                 <!--  <button class="btn btn-primary" type="button" data-type="SYNC">Download Tracks</button>
                   <button class="btn btn-danger glyphicon glyphicon-off pull-right" title="Shutdown System" type="button" data-type="SHUTDOWN"></button>
                    <button class="btn btn-alert glyphicon glyphicon-trash pull-right" title="Empty Playlist" type="button" data-type="REMOVE"></button> -->
-
             </div>
             <div class="input-group">
                 <input id="txtSearch" class="form-control" type="text" ng-model="search" placeholder="Search for tracks..." />
@@ -56,8 +55,8 @@
             <div class="track-label">
                 {{title}} <span class="label">(Album)</span>
                 <div class="extras">
-                    <span style="font-size:1.2rem;"> by {{ artist }}</span><br />
-                    <span style="font-size:1.2rem;"><em>{{album}} (Year {{year}} Track {{track.no}} of {{track.of}})</em></span>
+                    <span> by {{ artist }}</span><br />
+                    <span><em>{{album}} (Year {{year}} Track {{track.no}} of {{track.of}})</em></span>
                 </div>
             </div>
             <span class="btn-wrapper">
