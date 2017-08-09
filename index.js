@@ -44,7 +44,7 @@ express.get('/audio/:id', cors(), function (req, res) {
     }
 });
 
-http.listen(8080);
+http.listen(parseInt(config.ip));
 
 collection.Load();
 
